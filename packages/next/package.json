@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/next",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "> TODO: description",
   "keywords": [
     "next.js",
@@ -36,6 +36,6 @@
     "vite-plugin-dts": "^2.2.0"
   },
   "dependencies": {
-    "@iamjs/core": "^0.1.0"
+    "@iamjs/core": "^0.1.1"
   }
 }
