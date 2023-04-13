@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/express",
-  "version": "0.1.2",
+  "version": "0.1.0",
   "description": "> TODO: description",
   "keywords": [
     "iamjs",
@@ -38,5 +38,6 @@
   },
   "dependencies": {
     "@iamjs/core": "../core/src"
-  }
+  },
+  "gitHead": "25eac252720288b823c4847328c9ac66efda0f4d"
 }
