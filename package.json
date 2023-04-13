@@ -1,6 +1,6 @@
 {
   "name": "iamjs",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Fully featured library to add authorization to your applications",
   "main": "index.js",
   "author": "Mohamed Achaq",
