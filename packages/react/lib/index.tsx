@@ -1,4 +1,4 @@
-import { IRole, Role, permission, permissions } from "@iamjs/core";
+import { IRole, Role, permission, permissions } from "@iamjs/core/lib";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   PermissionContextType,

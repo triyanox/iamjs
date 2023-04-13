@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { AuthError, AuthManager } from "@iamjs/core";
+import { AuthError, AuthManager } from "@iamjs/core/lib";
 import {
   IExpressAutorizeOptions,
   IExpressRoleManager,

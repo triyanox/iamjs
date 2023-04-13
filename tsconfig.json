@@ -11,12 +11,13 @@
     "outDir": "dist",
     "sourceMap": true,
     "target": "es6",
-    "baseUrl": ".",
     "jsx": "react",
     "paths": {
       "@iamjs/*": ["packages/*/lib"]
     },
+    "baseUrl": ".",
     "typeRoots": ["node_modules/@types", "types"]
   },
+  "include": ["packages/*/lib/**/*", "packages/*/types/**/*"],
   "exclude": ["node_modules", "dist"]
 }
