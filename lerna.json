@@ -8,5 +8,11 @@
     "@iamjs/koa"
   ],
   "version": "independent",
-  "useWorkspaces": true
+  "useWorkspaces": true,
+  "command": {
+    "publish": {
+      "allowBranch": ["main"],
+      "registry": "https://registry.npmjs.org/"
+    }
+  }
 }
