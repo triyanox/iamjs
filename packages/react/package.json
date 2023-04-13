@@ -10,6 +10,7 @@
   ],
   "author": "Mohamed Achaq <hi@achaq.dev>",
   "homepage": "https://iamjs.achaq.dev",
+  "registry": "https://registry.npmjs.org/",
   "license": "MIT",
   "main": "lib/index.tsx",
   "directories": {
