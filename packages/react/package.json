@@ -1,7 +1,7 @@
 {
   "name": "@iamjs/react",
   "version": "0.2.0",
-  "description": "> TODO: description",
+  "description": "This package contains React components that can be used to easily integrate the authorization library into a React application.",
   "keywords": [
     "iamjs",
     "react",
@@ -12,13 +12,16 @@
   "homepage": "https://iamjs.achaq.dev",
   "registry": "https://registry.npmjs.org/",
   "license": "MIT",
-  "main": "lib/index.tsx",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "typings": "dist/types/index.d.ts",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
   },
   "files": [
-    "lib"
+    "lib",
+    "dist"
   ],
   "publishConfig": {
     "access": "public"
