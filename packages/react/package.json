@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/react",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "> TODO: description",
   "keywords": [
     "iamjs",
@@ -39,6 +39,6 @@
     "vite-plugin-dts": "^2.2.0"
   },
   "dependencies": {
-    "@iamjs/core": "^0.1.1"
+    "@iamjs/core": "^0.1.2"
   }
 }
