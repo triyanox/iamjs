@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/react",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "This package contains React components that can be used to easily integrate the authorization library into a React application.",
   "keywords": [
     "iamjs",
@@ -43,7 +43,7 @@
     "vite-plugin-dts": "^2.2.0"
   },
   "dependencies": {
-    "@iamjs/core": "^0.2.1"
+    "@iamjs/core": "^0.2.2"
   },
   "gitHead": "25eac252720288b823c4847328c9ac66efda0f4d"
 }
