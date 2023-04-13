@@ -1,0 +1,12 @@
+{
+  "packages": [
+    "packages/*",
+    "@iamjs/react",
+    "@iamjs/next",
+    "@iamjs/core",
+    "@iamjs/express",
+    "@iamjs/koa"
+  ],
+  "version": "independent",
+  "useWorkspaces": true
+}

@@ -1,0 +1,22 @@
+{
+  "name": "iamjs",
+  "version": "1.0.0",
+  "description": "Fully featured library to add authorization to your applications",
+  "main": "index.js",
+  "author": "Mohamed Achaq",
+  "license": "MIT",
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "lerna": "^6.6.1",
+    "typescript": "^5.0.4"
+  },
+  "scripts": {
+    "test": "lerna run test",
+    "build": "lerna run build",
+    "bootstrap": "lerna bootstrap",
+    "clean": "lerna clean",
+    "publish": "lerna publish"
+  }
+}
