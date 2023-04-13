@@ -9,7 +9,7 @@ import {
   permission,
   permissions,
   scopes,
-} from "../types";
+} from "@iamjs/core/types";
 
 /**
  * Role class

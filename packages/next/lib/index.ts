@@ -4,7 +4,7 @@ import {
   INextAutorizeOptions,
   INextRoleManager,
   INextRoleManagerOptions,
-} from "../types";
+} from "@iamjs/next/types";
 
 /**
  * The class that is used to manage roles and permissions

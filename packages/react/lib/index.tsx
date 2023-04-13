@@ -4,7 +4,7 @@ import {
   PermissionContextType,
   PermissionProviderProps,
   usePermType,
-} from "../types";
+} from "@iamjs/react/types";
 
 const PermissionContext = createContext<PermissionContextType>({
   permissions: {},

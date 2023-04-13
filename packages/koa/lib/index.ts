@@ -3,7 +3,7 @@ import {
   IKoaAutorizeOptions,
   IKoaRoleManager,
   IKoaRoleManagerOptions,
-} from "../types";
+} from "@iamjs/koa/types";
 import { Context, Next } from "koa";
 
 class KoaRoleManager extends AuthManager implements IKoaRoleManager {
