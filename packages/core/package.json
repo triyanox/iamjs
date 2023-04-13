@@ -20,7 +20,7 @@
     "test": "__tests__"
   },
   "files": [
-    "lib",
+    "types",
     "dist"
   ],
   "scripts": {
