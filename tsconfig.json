@@ -12,9 +12,6 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "esModuleInterop": true,
-    "paths": {
-      "@iamjs/*": ["packages/*/lib"]
-    },
     "baseUrl": ".",
     "typeRoots": ["node_modules/@types", "types"]
   },

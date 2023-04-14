@@ -4,7 +4,7 @@ import {
   IExpressAutorizeOptions,
   IExpressRoleManager,
   IExpressRoleManagerOptions,
-} from "@iamjs/express/types";
+} from "../types";
 
 class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
   onError?: <T extends Request, U extends Response = Response>(

@@ -10,5 +10,9 @@ module.exports = {
       formats: ["cjs", "es"],
     },
   },
-  plugins: [dts()],
+  plugins: [
+    dts({
+      outputDir: "dist",
+    }),
+  ],
 };

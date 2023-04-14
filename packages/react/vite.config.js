@@ -10,7 +10,11 @@ module.exports = {
       formats: ["cjs", "es", "umd"],
     },
   },
-  plugins: [dts()],
+  plugins: [
+    dts({
+      outputDir: "dist",
+    }),
+  ],
   rollupOptions: {
     external: ["react"],
     output: {
