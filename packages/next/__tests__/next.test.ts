@@ -8,7 +8,7 @@ describe("NextRoleManager", () => {
         resource: "resource2",
         action: ["create", "update"],
       },
-      (req, res) => {
+      (_req, res) => {
         res.status(200).send("Hello World!");
       }
     );
@@ -26,7 +26,7 @@ describe("NextRoleManager", () => {
         resource: "resource1",
         action: ["create", "update"],
       },
-      (req, res) => {
+      (_req, res) => {
         res.status(200).send("Hello World!");
       }
     );
@@ -47,7 +47,7 @@ describe("NextRoleManager", () => {
         usePermissionKey: true,
         roleKey: "role",
       },
-      (req, res) => {
+      (_req, res) => {
         res.status(200).send("Hello World!");
       }
     );

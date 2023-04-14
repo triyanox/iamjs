@@ -1,5 +1,5 @@
 import { Context, Next } from "koa";
-import { AuthError, IAuthManager, IRole, permission } from "@iamjs/core/lib";
+import { AuthError, IAuthManager, IRole, permission } from "@iamjs/core";
 
 /**
  * The interface for the `authorize` function

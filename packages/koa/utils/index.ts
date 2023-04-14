@@ -1,7 +1,7 @@
 import Koa, { Context, Next } from "koa";
 import Router from "koa-router";
 import request from "supertest";
-import { Role } from "@iamjs/core/lib";
+import { Role } from "@iamjs/core";
 import { KoaRoleManager } from "@iamjs/koa";
 
 const role = new Role([

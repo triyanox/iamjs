@@ -1,6 +1,6 @@
 import express, { Request } from "express";
 import request from "supertest";
-import { Role } from "@iamjs/core/lib";
+import { Role } from "@iamjs/core";
 import { ExpressRoleManager } from "@iamjs/express";
 
 const role = new Role([

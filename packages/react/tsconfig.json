@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "jsx": "react"
+    "jsx": "react",
+    "paths": {
+      "@iamjs/core": ["node_modules/@iamjs/core"]
+    }
   },
   "extends": "../../tsconfig.json",
   "include": ["**/*.ts", "**/*.tsx"],

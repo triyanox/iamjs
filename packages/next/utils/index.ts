@@ -1,4 +1,4 @@
-import { Role } from "@iamjs/core/lib";
+import { Role } from "@iamjs/core";
 import { NextRoleManager } from "@iamjs/next";
 import { createServer } from "http";
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";

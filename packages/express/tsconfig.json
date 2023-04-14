@@ -1,5 +1,10 @@
 {
   "extends": "../../tsconfig.json",
   "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "**/__tests__/*"]
+  "exclude": ["node_modules", "**/__tests__/*"],
+  "compilerOptions": {
+    "paths": {
+      "@iamjs/core": ["node_modules/@iamjs/core"]
+    }
+  }
 }

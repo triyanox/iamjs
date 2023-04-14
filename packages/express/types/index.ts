@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { IAuthManager, IRole, permission, AuthError } from "@iamjs/core/lib";
+import { IAuthManager, IRole, permission, AuthError } from "@iamjs/core";
 
 /**
  * We used declaration merging to add the `role` and `permissions` keys to the `Request` interface

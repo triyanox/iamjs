@@ -1,4 +1,4 @@
-import { IRole, permission, permissions } from "@iamjs/core/lib";
+import { IRole, permission, permissions } from "@iamjs/core";
 import { ReactNode } from "react";
 
 interface PermissionProviderProps {

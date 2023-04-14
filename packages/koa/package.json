@@ -13,7 +13,7 @@
   "registry": "https://registry.npmjs.org/",
   "license": "MIT",
   "main": "dist/index.js",
-  "module": "dist/index.js",
+  "module": "dist/index.mjs",
   "typings": "dist/index.d.ts",
   "directories": {
     "lib": "lib",
@@ -45,5 +45,8 @@
     "vite": "^4.2.1",
     "vite-plugin-dts": "^2.2.0"
   },
-  "gitHead": "25eac252720288b823c4847328c9ac66efda0f4d"
+  "gitHead": "25eac252720288b823c4847328c9ac66efda0f4d",
+  "dependencies": {
+    "@iamjs/core": "^0.2.3"
+  }
 }

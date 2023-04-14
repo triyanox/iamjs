@@ -1,4 +1,4 @@
-import { Role } from "@iamjs/core/lib";
+import { Role } from "@iamjs/core";
 
 describe("Create role and check permissions", () => {
   const role = new Role([
