@@ -4,16 +4,11 @@ import dts from "vite-plugin-dts";
 module.exports = {
   build: {
     lib: {
-      entry: resolve(__dirname, "lib/index.ts"),
+      entry: resolve(__dirname, "index.ts"),
       name: "@iamjs/express",
       fileName: "index",
       formats: ["cjs", "es"],
     },
   },
-  plugins: [
-    dts({
-      insertTypesEntry: true,
-      outputDir: "dist/types",
-    }),
-  ],
+  plugins: [dts()],
 };

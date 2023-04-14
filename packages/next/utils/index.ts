@@ -1,4 +1,4 @@
-import { Role } from "@iamjs/core";
+import { Role } from "@iamjs/core/lib";
 import { NextRoleManager } from "@iamjs/next";
 import { createServer } from "http";
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
@@ -28,7 +28,7 @@ const roleManager = new NextRoleManager({
     role1: role,
   },
   resources: ["resource1", "resource2"],
-  onError(err, req, res) {
+  onError(_err, _req, res) {
     res.status(403).send("Forbidden");
   },
 });

@@ -14,7 +14,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "typings": "dist/types/index.d.ts",
+  "typings": "dist/index.d.ts",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -25,7 +25,9 @@
   ],
   "scripts": {
     "test": "jest --config=./jest.config.js",
-    "build": "vite build --config vite.config.js"
+    "build": "rm -rf dist && vite build --config vite.config.js",
+    "prepublishOnly": "npm run build",
+    "clean": "rm -rf dist"
   },
   "publishConfig": {
     "access": "public"

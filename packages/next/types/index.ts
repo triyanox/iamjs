@@ -1,4 +1,4 @@
-import { AuthError, IAuthManager, IRole, permission } from "@iamjs/core";
+import { AuthError, IAuthManager, IRole, permission } from "@iamjs/core/lib";
 import { NextApiRequest, NextApiResponse } from "next";
 
 /**

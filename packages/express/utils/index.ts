@@ -1,6 +1,6 @@
 import express, { Request } from "express";
 import request from "supertest";
-import { Role } from "@iamjs/core";
+import { Role } from "@iamjs/core/lib";
 import { ExpressRoleManager } from "@iamjs/express";
 
 const role = new Role([
@@ -19,10 +19,10 @@ const roleManager = new ExpressRoleManager({
     role1: role,
   },
   resources: ["resource1", "resource2"],
-  onError(err, req, res, next) {
+  onError(_err, _req, res, _next) {
     res.status(403).send("Forbidden");
   },
-  onSucess(req, res, next) {
+  onSucess(_req, res, _next) {
     res.status(200).send("Hello World from the success handler!");
   },
 });
@@ -36,7 +36,7 @@ type IAuthRequest = Request & {
 
 app.get(
   "/resource1",
-  (req, res, next) => {
+  (req, _res, next) => {
     req.role = "role1";
     next();
   },
@@ -44,14 +44,14 @@ app.get(
     resource: "resource1",
     action: ["create", "update"],
   }),
-  (req, res) => {
+  (_req, res) => {
     res.send("Hello World!");
   }
 );
 
 app.get(
   "/resource2",
-  (req, res, next) => {
+  (req, _res, next) => {
     (req as unknown as IAuthRequest).role = "role1";
     next();
   },
@@ -59,14 +59,14 @@ app.get(
     resource: "resource2",
     action: ["create", "update"],
   }),
-  (req, res) => {
+  (_req, res) => {
     res.send("Hello World!");
   }
 );
 
 app.get(
   "/loose",
-  (req, res, next) => {
+  (req, _res, next) => {
     (req as unknown as IAuthRequest).role = "role1";
     next();
   },
@@ -75,14 +75,14 @@ app.get(
     action: ["create", "update"],
     loose: true,
   }),
-  (req, res) => {
+  (_req, res) => {
     res.send("Hello World!");
   }
 );
 
 app.get(
   "/multiple",
-  (req, res, next) => {
+  (req, _res, next) => {
     (req as unknown as IAuthRequest).role = "role1";
     next();
   },
@@ -90,14 +90,14 @@ app.get(
     resource: ["resource1", "resource2"],
     action: ["create", "update"],
   }),
-  (req, res) => {
+  (_req, res) => {
     res.send("Hello World!");
   }
 );
 
 app.get(
   "/from-permissions",
-  (req, res, next) => {
+  (req, _res, next) => {
     (req as unknown as IAuthRequest).role = "role1";
     (req as unknown as IAuthRequest).permissions = role.toObject();
     next();
@@ -107,7 +107,7 @@ app.get(
     action: ["create", "update"],
     usePermissionKey: true,
   }),
-  (req, res) => {
+  (_req, res) => {
     res.send("Hello World!");
   }
 );

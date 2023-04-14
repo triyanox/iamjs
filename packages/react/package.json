@@ -14,7 +14,7 @@
   "license": "MIT",
   "main": "dist/index.js",
   "module": "dist/index.js",
-  "typings": "dist/types/index.d.ts",
+  "typings": "dist/index.d.ts",
   "directories": {
     "lib": "lib",
     "test": "__tests__"
@@ -28,7 +28,9 @@
   },
   "scripts": {
     "test": "jest --config=./jest.config.js",
-    "build": "vite build --config vite.config.js"
+    "build": "rm -rf dist && vite build --config vite.config.js",
+    "prepublishOnly": "npm run build",
+    "clean": "rm -rf dist"
   },
   "devDependencies": {
     "@testing-library/jest-dom": "^5.16.5",
@@ -41,9 +43,6 @@
     "ts-jest": "^29.1.0",
     "vite": "^4.2.1",
     "vite-plugin-dts": "^2.2.0"
-  },
-  "dependencies": {
-    "@iamjs/core": "^0.2.2"
   },
   "gitHead": "25eac252720288b823c4847328c9ac66efda0f4d"
 }

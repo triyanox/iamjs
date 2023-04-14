@@ -1,4 +1,4 @@
-import { Role } from "@iamjs/core";
+import { Role } from "@iamjs/core/lib";
 import { usePerm } from "@iamjs/react";
 import React from "react";
 

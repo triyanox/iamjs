@@ -1,7 +1,5 @@
-import { IRole, permission, permissions } from "@iamjs/core";
+import { IRole, permission, permissions } from "@iamjs/core/lib";
 import { ReactNode } from "react";
-
-type Concat<T extends any[], U extends any[]> = [...T, ...U];
 
 interface PermissionProviderProps {
   children: ReactNode;

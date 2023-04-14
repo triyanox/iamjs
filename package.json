@@ -18,6 +18,7 @@
     "build": "lerna run build",
     "bootstrap": "lerna bootstrap",
     "clean": "lerna clean",
-    "publish": "lerna publish"
+    "publish": "lerna publish",
+    "cleanPkgs": "rm -rf packages/*/dist"
   }
 }

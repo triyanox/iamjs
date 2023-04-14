@@ -55,7 +55,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
     if (actions.length) {
       const actionList = actions[0].split(",");
       return actionList.reduce((acc, curr) => {
-        acc = (acc && grantedActions[curr]) ?? false;
+        acc = (acc && grantedActions[curr as permission]) ?? false;
         return acc;
       }, true);
     }
@@ -67,11 +67,11 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
       }, {} as Record<permission, boolean>);
     }
 
-    return grantedActions[permission ?? ""] ?? false;
+    return grantedActions[permission ?? ("" as permission)] ?? false;
   };
 
   const setInitialPerm = (role: IRole | string) => {
-    let init: IRole;
+    let init: IRole = {} as IRole;
 
     if (typeof role === "string") {
       init = Role.fromJSON(role);
@@ -110,7 +110,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
     if (actions.length) {
       const actionList = actions[0].split(",");
       return actionList.reduce((acc, curr) => {
-        acc = (acc && grantedActions[curr]) ?? false;
+        acc = (acc && grantedActions[curr as permission]) ?? false;
         return acc;
       }, true);
     }
@@ -122,7 +122,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
       }, true);
     }
 
-    return grantedActions[permission ?? ""] ?? false;
+    return grantedActions[permission ?? ("" as permission)] ?? false;
   };
 
   return (

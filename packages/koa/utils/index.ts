@@ -1,7 +1,7 @@
 import Koa, { Context, Next } from "koa";
 import Router from "koa-router";
 import request from "supertest";
-import { Role } from "@iamjs/core";
+import { Role } from "@iamjs/core/lib";
 import { KoaRoleManager } from "@iamjs/koa";
 
 const role = new Role([
@@ -20,7 +20,7 @@ const roleManager = new KoaRoleManager({
     role1: role,
   },
   resources: ["resource1", "resource2"],
-  onError(err, ctx, next): Promise<void> {
+  onError(_err, ctx, next): Promise<void> {
     ctx.status = 403;
     ctx.body = "Forbidden";
     return next();

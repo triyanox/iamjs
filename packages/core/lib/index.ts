@@ -239,7 +239,7 @@ class Role implements IRole {
         cb(result);
       }
       return result;
-    } catch (e) {
+    } catch (e: any) {
       if (cb) {
         cb(false, e);
       }
