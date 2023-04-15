@@ -276,4 +276,4 @@ export default withAuth(handler);
 
 ## License
 
-[MIT]('../../../../LICENSE)
+[MIT](https://github.com/triyanox/iamjs/blob/main/LICENSE)

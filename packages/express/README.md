@@ -272,4 +272,4 @@ app.listen(3000, () => {
 
 ## License
 
-[MIT]('../../../../LICENSE)
+[MIT](https://github.com/triyanox/iamjs/blob/main/LICENSE)
