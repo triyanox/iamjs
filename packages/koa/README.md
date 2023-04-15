@@ -65,7 +65,7 @@ const roleManager = new KoaRoleManager({
   roles: {
     user,
   },
-  resources: ['post', 'post'],
+  resources: ['user', 'post'],
 });
 
 router.get('/post', 
@@ -74,8 +74,8 @@ router.get('/post',
     await next();
   },
   roleManager.authorize({
-    resource: 'comment',
-    action: ['read', 'list'],
+    resource: 'user',
+    action: ['read', 'create'],
   }), 
   (ctx) => {
     ctx.body = 'Hello World!';
@@ -127,7 +127,7 @@ const roleManager = new KoaRoleManager({
   roles: {
     user,
   },
-  resources: ['post', 'post'],
+  resources: ['user', 'post'],
 });
 
 const router = new Router();
@@ -142,8 +142,8 @@ router.get('/post',
   auth,
   roleManager.authorize({
     roleKey: 'role',
-    resource: 'comment',
-    action: ['read', 'list'],
+    resource: 'user',
+    action: ['read', 'create'],
     usePermissionKey: true,
     permissionKey: 'permissions',
   }), 
@@ -210,8 +210,8 @@ router.get('/post',
   auth,
   roleManager.authorize({
     roleKey: 'role',
-    resource: 'comment',
-    action: ['read', 'list'],
+    resource: 'user',
+    action: ['read', 'create'],
     usePermissionKey: true,
     permissionKey: 'permissions',
   }), 
@@ -261,7 +261,7 @@ const roleManager = new KoaRoleManager({
   roles: {
     user,
   },
-  resources: ['post', 'post'],
+  resources: ['user', 'post'],
   onSuccess : <CustomContext>(ctx, next) => {
     ctx.body = 'Hello World!';
   },
@@ -281,8 +281,8 @@ router.get('/post',
   auth,
   roleManager.authorize<CustomContext>({
     roleKey: 'role',
-    resource: 'comment',
-    action: ['read', 'list'],
+    resource: 'user',
+    action: ['read', 'create'],
     usePermissionKey: true,
     permissionKey: 'permissions',
   }), 

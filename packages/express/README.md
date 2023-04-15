@@ -61,7 +61,7 @@ const roleManager = new ExpressRoleManager({
   roles: {
     user,
   },
-  resources: ['post', 'post'],
+  resources: ['user', 'post'],
 });
 
 app.get('/post',
@@ -70,8 +70,8 @@ app.get('/post',
     next();
   },
   roleManager.authorize({
-    resource: 'comment',
-    action: ['read', 'list'],
+    resource: 'user',
+    action: ['read', 'create'],
   }), 
   (req, res) => {
   res.send('Hello World!');
@@ -119,7 +119,7 @@ const roleManager = new ExpressRoleManager({
   roles: {
     user,
   },
-  resources: ['post', 'post'],
+  resources: ['user', 'post'],
 });
 
 const auth = async (req, res, next) => {
@@ -132,8 +132,8 @@ app.get('/post',
   auth,
   roleManager.authorize({
     roleKey: 'role',
-    resource: 'comment',
-    action: ['read', 'list'],
+    resource: 'user',
+    action: ['read', 'create'],
     usePermissionKey: true,
     permissionKey: 'permissions',
   }), 
@@ -174,7 +174,7 @@ const roleManager = new ExpressRoleManager({
   roles: {
     user,
   },
-  resources: ['post', 'post'],
+  resources: ['user', 'post'],
   onSuccess: (req, res, next) => {
     res.send('Hello World!');
   },
@@ -194,8 +194,8 @@ app.get('/post',
   auth,
   roleManager.authorize({
     roleKey: 'role',
-    resource: 'comment',
-    action: ['read', 'list'],
+    resource: 'user',
+    action: ['read', 'create'],
     usePermissionKey: true,
     permissionKey: 'permissions',
   }), 
@@ -236,7 +236,7 @@ const roleManager = new ExpressRoleManager({
   roles: {
     user,
   },
-  resources: ['post', 'post'],
+  resources: ['user', 'post'],
   onSuccess : <express.Request, express.Response>(req, res, next) => {
     res.send('Hello World!');
   },
@@ -256,8 +256,8 @@ app.get('/post',
   auth,
   roleManager.authorize<express.Request, express.Response>({
     roleKey: 'role',
-    resource: 'comment',
-    action: ['read', 'list'],
+    resource: 'user',
+    action: ['read', 'create'],
     usePermissionKey: true,
     permissionKey: 'permissions',
   }), 
