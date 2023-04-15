@@ -98,7 +98,7 @@ type usePermType = {
    * Sets the initial set of permissions based on the provided `IRole` object.
    * @param role The role object from which to derive the initial permissions.
    */
-  load: (role: IRole) => void;
+  load: (role: IRole | string) => void;
 
   /**
    * Generates a JSON or object representation of the current set of permissions.
