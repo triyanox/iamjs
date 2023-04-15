@@ -6,7 +6,8 @@
     "iamjs",
     "auth",
     "permissions",
-    "roles"
+    "roles",
+    "access control"
   ],
   "author": "Mohamed Achaq <hi@achaq.dev>",
   "homepage": "https://iamjs.achaq.dev",
@@ -20,7 +21,6 @@
     "test": "__tests__"
   },
   "files": [
-    "types",
     "dist"
   ],
   "scripts": {
