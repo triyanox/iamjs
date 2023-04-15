@@ -1,8 +1,8 @@
 import { IRole, permission, permissions } from '@iamjs/core';
-import { ReactNode } from 'react';
+import React from 'react';
 
 interface PermissionProviderProps {
-  children: ReactNode;
+  children: React.ReactNode;
   role?: IRole | string;
 }
 
@@ -119,4 +119,4 @@ type usePermType = {
   show: (resource: string, permission?: permissions) => boolean;
 };
 
-export type { PermissionContextType, usePermType, PermissionProviderProps };
+export type { PermissionContextType, PermissionProviderProps, usePermType };

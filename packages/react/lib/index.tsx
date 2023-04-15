@@ -1,8 +1,8 @@
 import { IRole, Role, permission, permissions } from '@iamjs/core';
-import { FC, createContext, useContext, useEffect, useRef, useState } from 'react';
+import React from 'react';
 import { PermissionContextType, PermissionProviderProps, usePermType } from '../types';
 
-const PermissionContext = createContext<PermissionContextType>({
+const PermissionContext = React.createContext<PermissionContextType>({
   permissions: {},
   setPerm: () => {},
   getPerm: () => false,
@@ -14,12 +14,14 @@ const PermissionContext = createContext<PermissionContextType>({
 /**
  * A React context provider that provides the current set of permissions and functions to set and get permissions.
  */
-const PermissionProvider: FC<PermissionProviderProps> = ({
+const PermissionProvider: React.FC<PermissionProviderProps> = ({
   children,
   role
 }: PermissionProviderProps) => {
-  const [permissions, setPermissions] = useState<Record<string, Record<permission, boolean>>>({});
-  const roleSet = useRef(false);
+  const [permissions, setPermissions] = React.useState<Record<string, Record<permission, boolean>>>(
+    {}
+  );
+  const roleSet = React.useRef(false);
 
   const setInitialPerm = (role: IRole | string) => {
     let init: IRole = {} as IRole;
@@ -41,7 +43,7 @@ const PermissionProvider: FC<PermissionProviderProps> = ({
     roleSet.current = true;
   };
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (role && !roleSet.current) {
       setInitialPerm(role);
       roleSet.current = true;
@@ -139,8 +141,8 @@ const PermissionProvider: FC<PermissionProviderProps> = ({
  */
 const usePerm = (role?: IRole | string): usePermType => {
   const { permissions, setPerm, getPerm, setInitialPerm, generate, show } =
-    useContext(PermissionContext);
-  useEffect(() => {
+    React.useContext(PermissionContext);
+  React.useEffect(() => {
     if (role) {
       setInitialPerm(role);
     }
