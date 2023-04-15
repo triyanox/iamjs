@@ -15,3 +15,11 @@ You can install `iamjs` using one of the following packages:
 - [`@iamjs/react` ⚛️](packages/react/README.md) - for react component
 
 Alternatively, you can use the `@iamjs/core` 🧠 package, which contains all the necessary logic and can be used with any framework.
+
+## Contributing
+
+Contributions are welcome! Please read the [contributing guide](CONTRIBUTING.md) for more information.
+
+## License
+
+[MIT](https://github.com/triyanox/iamjs/blob/main/LICENSE)
