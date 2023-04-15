@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
-    "jsx": "react",
     "paths": {
       "@iamjs/core": ["node_modules/@iamjs/core"]
-    }
+    },
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "Node"
   },
   "extends": "../../tsconfig.json",
   "include": ["**/*.ts", "**/*.tsx"],
