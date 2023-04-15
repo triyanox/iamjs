@@ -43,5 +43,8 @@
     "vite": "^4.2.1",
     "vite-plugin-dts": "^2.2.0"
   },
-  "gitHead": "25eac252720288b823c4847328c9ac66efda0f4d"
+  "gitHead": "25eac252720288b823c4847328c9ac66efda0f4d",
+  "dependencies": {
+    "@iamjs/core": "^0.3.0"
+  }
 }
