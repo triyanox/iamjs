@@ -1,12 +1,7 @@
 import { PermissionProvider } from '@iamjs/react';
 import '@testing-library/jest-dom';
 import { act, render } from '@testing-library/react';
-import {
-  PermissionProviderTestComponent,
-  PermissionsStingTestComponent,
-  WithPermissionProviderTestComponent,
-  role
-} from '../utils';
+import { PermissionProviderTestComponent, PermissionsStingTestComponent } from '../utils';
 
 describe('PermissionProvider', () => {
   it('should set and get permissions correctly', async () => {
@@ -59,23 +54,5 @@ describe('PermissionString', () => {
       setPermButton.click();
     });
     expect(getByTestId('books-read-permission')).toHaveTextContent('true');
-  });
-});
-
-describe('Load permissions with permission provider', () => {
-  it('should set and get permissions correctly', async () => {
-    const { getByTestId } = render(
-      <PermissionProvider role={role}>
-        <WithPermissionProviderTestComponent />
-      </PermissionProvider>
-    );
-
-    expect(getByTestId('books-create-permission')).toHaveTextContent('false');
-    const setPermButton = getByTestId('set-perm-button');
-
-    await act(async () => {
-      setPermButton.click();
-    });
-    expect(getByTestId('books-create-permission')).toHaveTextContent('true');
   });
 });

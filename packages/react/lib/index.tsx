@@ -15,13 +15,11 @@ const PermissionContext = React.createContext<PermissionContextType>({
  * A React context provider that provides the current set of permissions and functions to set and get permissions.
  */
 const PermissionProvider: React.FC<PermissionProviderProps> = ({
-  children,
-  role
+  children
 }: PermissionProviderProps) => {
   const [permissions, setPermissions] = React.useState<Record<string, Record<permission, boolean>>>(
     {}
   );
-  const roleSet = React.useRef(false);
 
   const setInitialPerm = (role: IRole | string) => {
     let init: IRole = {} as IRole;
@@ -40,15 +38,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
     });
 
     setPermissions(init.toObject() as Record<string, Record<permission, boolean>>);
-    roleSet.current = true;
   };
-
-  React.useEffect(() => {
-    if (role && !roleSet.current) {
-      setInitialPerm(role);
-      roleSet.current = true;
-    }
-  }, [role]);
 
   const setPerm = (resource: string, permission: permissions, grant: boolean) => {
     const newPermissions = { ...permissions };

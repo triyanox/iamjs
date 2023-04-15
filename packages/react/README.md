@@ -121,7 +121,7 @@ const Component = () => {
 
 ### Load role
 
-In addition to the `PermissionProvider` you can also load the role using the `load` function from the `usePerm` hook or pass the role json directly to `usePerm` hook.
+You can also load the role using the `load` function from the `usePerm` hook or pass the role json directly to `usePerm` hook.
 
 ```tsx
 import { usePerm, PermissionProvider } from '@iamjs/react';
@@ -135,8 +135,7 @@ const role = new Role([
 
 const App = () => {
   return (
-    // you can also pass the role to PermissionProvider
-    <PermissionProvider role={role}> 
+    <PermissionProvider> 
       <Component />
     </PermissionProvider>
   );
