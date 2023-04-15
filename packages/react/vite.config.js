@@ -8,7 +8,7 @@ module.exports = {
       entry: resolve(__dirname, 'index.tsx'),
       name: '@iamjs/react',
       fileName: 'index',
-      formats: ['es', 'umd']
+      formats: ['es']
     }
   },
   plugins: [

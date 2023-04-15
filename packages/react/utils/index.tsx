@@ -1,6 +1,5 @@
 import { Role } from '@iamjs/core';
 import { usePerm } from '@iamjs/react';
-import React from 'react';
 
 const role = new Role([
   {

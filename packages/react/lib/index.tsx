@@ -1,5 +1,5 @@
 import { IRole, Role, permission, permissions } from '@iamjs/core';
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
+import { FC, createContext, useContext, useEffect, useRef, useState } from 'react';
 import { PermissionContextType, PermissionProviderProps, usePermType } from '../types';
 
 const PermissionContext = createContext<PermissionContextType>({
@@ -14,7 +14,7 @@ const PermissionContext = createContext<PermissionContextType>({
 /**
  * A React context provider that provides the current set of permissions and functions to set and get permissions.
  */
-const PermissionProvider: React.FC<PermissionProviderProps> = ({
+const PermissionProvider: FC<PermissionProviderProps> = ({
   children,
   role
 }: PermissionProviderProps) => {

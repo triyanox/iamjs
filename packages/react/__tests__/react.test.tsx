@@ -1,7 +1,6 @@
 import { PermissionProvider } from '@iamjs/react';
 import '@testing-library/jest-dom';
 import { act, render } from '@testing-library/react';
-import React from 'react';
 import {
   PermissionProviderTestComponent,
   PermissionsStingTestComponent,
