@@ -211,7 +211,7 @@ class Role implements IRole {
   public static fromObject(object: { [key: string]: any }): IRole {
     const permissions: IPermission[] = [];
     Object.keys(object).forEach((resource) => {
-      let scopes: string = "";
+      let scopes = "";
       Object.keys(object[resource]).forEach((scope) => {
         if (object[resource][scope]) {
           scopes += scope[0];

@@ -10,6 +10,9 @@
   ],
   "registry": "https://registry.npmjs.org/",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.58.0",
+    "@typescript-eslint/parser": "^5.58.0",
+    "eslint": "^8.38.0",
     "lerna": "^6.6.1",
     "typescript": "^5.0.4"
   },
@@ -19,6 +22,8 @@
     "bootstrap": "lerna bootstrap",
     "clean": "lerna clean",
     "publish": "lerna publish",
-    "cleanPkgs": "rm -rf packages/*/dist"
+    "cleanPkgs": "rm -rf packages/*/dist",
+    "lint": "eslint --config .eslintrc.json packages",
+    "lint:fix": "eslint --config .eslintrc.json --fix packages"
   }
 }
