@@ -1,4 +1,5 @@
 const { resolve } = require('path');
+import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
 
 module.exports = {
@@ -13,13 +14,15 @@ module.exports = {
   plugins: [
     dts({
       outputDir: 'dist'
-    })
+    }),
+    react()
   ],
   rollupOptions: {
-    external: ['react'],
+    external: ['react', 'react-dom'],
     output: {
       globals: {
-        react: 'React'
+        react: 'React',
+        'react-dom': 'ReactDOM'
       }
     }
   }
