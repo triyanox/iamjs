@@ -10,6 +10,12 @@ This package contains the core functionality of iamjs a library for easy role an
 npm install @iamjs/core
 ```
 
+or
+
+```bash
+yarn add @iamjs/core
+```
+
 ## Usage
 
 ### Creating a role
