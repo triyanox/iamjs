@@ -1,5 +1,5 @@
 import { IRole, Role, permission, permissions } from '@iamjs/core';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useState } from 'react';
 import { PermissionContextType, PermissionProviderProps, usePermType } from '../types';
 
 const PermissionContext = createContext<PermissionContextType>({
@@ -15,9 +15,38 @@ const PermissionContext = createContext<PermissionContextType>({
  * A React context provider that provides the current set of permissions and functions to set and get permissions.
  */
 const PermissionProvider: React.FC<PermissionProviderProps> = ({
-  children
+  children,
+  role
 }: PermissionProviderProps) => {
   const [permissions, setPermissions] = useState<Record<string, Record<permission, boolean>>>({});
+  const roleSet = useRef(false);
+
+  const setInitialPerm = (role: IRole | string) => {
+    let init: IRole = {} as IRole;
+
+    if (typeof role === 'string') {
+      init = Role.fromJSON(role);
+    }
+    if (role instanceof Role) {
+      init = role;
+    }
+
+    Role.validate(init, (result, err) => {
+      if (!result) {
+        throw err;
+      }
+    });
+
+    setPermissions(init.toObject() as Record<string, Record<permission, boolean>>);
+    roleSet.current = true;
+  };
+
+  useEffect(() => {
+    if (role && !roleSet.current) {
+      setInitialPerm(role);
+      roleSet.current = true;
+    }
+  }, [role]);
 
   const setPerm = (resource: string, permission: permissions, grant: boolean) => {
     const newPermissions = { ...permissions };
@@ -58,25 +87,6 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
     }
 
     return grantedActions[permission ?? ('' as permission)] ?? false;
-  };
-
-  const setInitialPerm = (role: IRole | string) => {
-    let init: IRole = {} as IRole;
-
-    if (typeof role === 'string') {
-      init = Role.fromJSON(role);
-    }
-    if (role instanceof Role) {
-      init = role;
-    }
-
-    Role.validate(init, (result, err) => {
-      if (!result) {
-        throw err;
-      }
-    });
-
-    setPermissions(init.toObject() as Record<string, Record<permission, boolean>>);
   };
 
   const generate = (type: 'json' | 'object') => {

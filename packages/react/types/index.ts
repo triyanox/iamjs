@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 
 interface PermissionProviderProps {
   children: ReactNode;
+  role?: IRole | string;
 }
 
 /**

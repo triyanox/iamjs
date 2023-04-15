@@ -60,8 +60,27 @@ const PermissionsStingTestComponent = () => {
   );
 };
 
+const WithPermissionProviderTestComponent = () => {
+  const { setPerm, getPerm } = usePerm();
+
+  const handleSetPerm = () => {
+    setPerm('books', 'create', true);
+  };
+
+  return (
+    <>
+      <div data-testid="books-create-permission">{getPerm('books', 'create').toString()}</div>
+      <button onClick={handleSetPerm} data-testid="set-perm-button">
+        Set Permission
+      </button>
+    </>
+  );
+};
+
 export {
   PermissionProviderTestComponent,
   PermissionsStingTestComponent,
-  FromJSONStringTestComponent
+  FromJSONStringTestComponent,
+  WithPermissionProviderTestComponent,
+  role
 };
