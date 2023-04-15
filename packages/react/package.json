@@ -46,6 +46,10 @@
   },
   "gitHead": "25eac252720288b823c4847328c9ac66efda0f4d",
   "dependencies": {
-    "@iamjs/core": "^0.3.0"
+    "@iamjs/core": "^0.3.0",
+    "react": "^18.2.0"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0"
   }
 }
