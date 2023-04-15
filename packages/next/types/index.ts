@@ -1,5 +1,5 @@
-import { AuthError, IAuthManager, IRole, permission } from "@iamjs/core";
-import { NextApiRequest, NextApiResponse } from "next";
+import { AuthError, IAuthManager, IRole, permission } from '@iamjs/core';
+import { NextApiRequest, NextApiResponse } from 'next';
 
 /**
  * The interface for the `authorize` function

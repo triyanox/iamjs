@@ -8,8 +8,8 @@ import {
   extendOpts,
   permission,
   permissions,
-  scopes,
-} from "../types";
+  scopes
+} from '../types';
 
 /**
  * Role class
@@ -24,20 +24,18 @@ class Role implements IRole {
     this.permissions = permissions;
   }
 
-  private formatPermission(
-    permission: permission
-  ): "c" | "r" | "u" | "d" | "l" {
+  private formatPermission(permission: permission): 'c' | 'r' | 'u' | 'd' | 'l' {
     switch (permission) {
-      case "create":
-        return "c";
-      case "read":
-        return "r";
-      case "update":
-        return "u";
-      case "delete":
-        return "d";
-      case "list":
-        return "l";
+      case 'create':
+        return 'c';
+      case 'read':
+        return 'r';
+      case 'update':
+        return 'u';
+      case 'delete':
+        return 'd';
+      case 'list':
+        return 'l';
       default:
         return permission;
     }
@@ -66,23 +64,23 @@ class Role implements IRole {
   }
 
   public canCreate(resource: string): boolean {
-    return this.can("create", resource);
+    return this.can('create', resource);
   }
 
   public canRead(resource: string): boolean {
-    return this.can("read", resource);
+    return this.can('read', resource);
   }
 
   public canUpdate(resource: string): boolean {
-    return this.can("update", resource);
+    return this.can('update', resource);
   }
 
   public canDelete(resource: string): boolean {
-    return this.can("delete", resource);
+    return this.can('delete', resource);
   }
 
   public canList(resource: string): boolean {
-    return this.can("list", resource);
+    return this.can('list', resource);
   }
 
   public can(permission: permission, resource: string): boolean {
@@ -154,9 +152,7 @@ class Role implements IRole {
     if (options.permissions) {
       this.permissions = role.permissions;
       options.permissions?.forEach((permission) => {
-        const existingPermission = this.permissions.find(
-          (p) => p.resource === permission.resource
-        );
+        const existingPermission = this.permissions.find((p) => p.resource === permission.resource);
         if (existingPermission) {
           return;
         } else {
@@ -167,32 +163,32 @@ class Role implements IRole {
     return this;
   }
 
-  public generate(format: "json" | "object" = "json"): string | object {
+  public generate(format: 'json' | 'object' = 'json'): string | object {
     const Object: any = {};
 
     this.permissions.forEach((permission) => {
       const resource = permission.resource;
       const scopes = permission.scopes;
       Object[resource] = {
-        create: scopes.includes("c"),
-        read: scopes.includes("r"),
-        update: scopes.includes("u"),
-        delete: scopes.includes("d"),
-        list: scopes.includes("l"),
+        create: scopes.includes('c'),
+        read: scopes.includes('r'),
+        update: scopes.includes('u'),
+        delete: scopes.includes('d'),
+        list: scopes.includes('l')
       };
     });
-    if (format === "json") {
+    if (format === 'json') {
       return JSON.stringify(Object);
     }
     return Object;
   }
 
   public toJSON() {
-    return this.generate("json") as string;
+    return this.generate('json') as string;
   }
 
   public toObject() {
-    return this.generate("object") as object;
+    return this.generate('object') as object;
   }
 
   /**
@@ -211,26 +207,23 @@ class Role implements IRole {
   public static fromObject(object: { [key: string]: any }): IRole {
     const permissions: IPermission[] = [];
     Object.keys(object).forEach((resource) => {
-      let scopes = "";
+      let scopes = '';
       Object.keys(object[resource]).forEach((scope) => {
         if (object[resource][scope]) {
           scopes += scope[0];
         } else {
-          scopes += "-";
+          scopes += '-';
         }
       });
       permissions.push({
         resource,
-        scopes: scopes as scopes,
+        scopes: scopes as scopes
       });
     });
     return new Role(permissions as IPermission[]);
   }
 
-  public static validate(
-    role: IRole,
-    cb?: (result: boolean, error?: Error) => void
-  ): boolean {
+  public static validate(role: IRole, cb?: (result: boolean, error?: Error) => void): boolean {
     try {
       const result = role.permissions.every((permission) => {
         return this.validatePermission(permission);
@@ -249,16 +242,16 @@ class Role implements IRole {
 
   public static validatePermission(permission: IPermission): boolean {
     if (!permission.resource) {
-      throw new Error("Resource is required");
+      throw new Error('Resource is required');
     }
     if (!permission.scopes) {
-      throw new Error("Scopes are required");
+      throw new Error('Scopes are required');
     }
     if (permission.scopes.length !== 5) {
-      throw new Error("Scopes must be 5 characters long");
+      throw new Error('Scopes must be 5 characters long');
     }
     if (!permission.scopes.match(/^[crudl-]+$/)) {
-      throw new Error("Scopes must be in the format of crudl");
+      throw new Error('Scopes must be in the format of crudl');
     }
     return true;
   }
@@ -303,23 +296,19 @@ class AuthManager implements IAuthManager {
     return this.resources.has(resource);
   }
 
-  private _getRole(
-    role: string,
-    constructRole?: boolean,
-    permissions?: any
-  ): IRole {
+  private _getRole(role: string, constructRole?: boolean, permissions?: any): IRole {
     try {
       let roleObject: IRole | undefined;
       if (constructRole) {
         roleObject = Role.fromObject(permissions);
         if (!roleObject) {
-          throw new AuthError("INVALID_PERMISSIONS");
+          throw new AuthError('INVALID_PERMISSIONS');
         }
         return roleObject;
       }
       roleObject = this.roles.get(role);
       if (!roleObject) {
-        throw new AuthError("INVALID_ROLE");
+        throw new AuthError('INVALID_ROLE');
       }
       return roleObject;
     } catch (error) {
@@ -363,15 +352,14 @@ class AuthManager implements IAuthManager {
   }
 
   private _verifyOptions(options: IAutorizeOptions) {
-    const { role, action, resource, constructRole, permissions, loose } =
-      options;
-    if (!action) throw AuthError.throw_error("MISSING_ACTION");
-    if (!resource) throw AuthError.throw_error("MISSING_RESOURCE");
+    const { role, action, resource, constructRole, permissions, loose } = options;
+    if (!action) throw AuthError.throw_error('MISSING_ACTION');
+    if (!resource) throw AuthError.throw_error('MISSING_RESOURCE');
     if (!constructRole && !this._checkRole(role as string)) {
-      throw AuthError.throw_error("INVALID_ROLE");
+      throw AuthError.throw_error('INVALID_ROLE');
     }
     if (!this._checkResource(resource)) {
-      throw AuthError.throw_error("INVALID_RESOURCE");
+      throw AuthError.throw_error('INVALID_RESOURCE');
     }
     return {
       role,
@@ -379,7 +367,7 @@ class AuthManager implements IAuthManager {
       resource,
       constructRole,
       permissions,
-      loose,
+      loose
     };
   }
 
@@ -387,11 +375,7 @@ class AuthManager implements IAuthManager {
     try {
       const { role, action, resource, constructRole, permissions, loose } =
         this._verifyOptions(options);
-      const roleObject = this._getRole(
-        role as string,
-        constructRole,
-        permissions
-      );
+      const roleObject = this._getRole(role as string, constructRole, permissions);
       if (Array.isArray(action)) {
         if (Array.isArray(resource)) {
           if (loose) {
@@ -432,5 +416,5 @@ export type {
   extendOpts,
   permission,
   permissions,
-  scopes,
+  scopes
 };

@@ -1,10 +1,6 @@
-import { NextFunction, Request, Response } from "express";
-import { AuthError, AuthManager } from "@iamjs/core";
-import {
-  IExpressAutorizeOptions,
-  IExpressRoleManager,
-  IExpressRoleManagerOptions,
-} from "../types";
+import { NextFunction, Request, Response } from 'express';
+import { AuthError, AuthManager } from '@iamjs/core';
+import { IExpressAutorizeOptions, IExpressRoleManager, IExpressRoleManagerOptions } from '../types';
 
 class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
   onError?: <T extends Request, U extends Response = Response>(
@@ -28,18 +24,15 @@ class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
   private _getRoleFromRequest(req: Request, roleKey: string): string {
     const role = req[roleKey as keyof Request];
     if (!role) {
-      throw AuthError.throw_error("INVALID_ROLE");
+      throw AuthError.throw_error('INVALID_ROLE');
     }
     return role;
   }
 
-  private _getPermissionsFromRequest(
-    req: Request,
-    permissionsKey: string
-  ): any {
+  private _getPermissionsFromRequest(req: Request, permissionsKey: string): any {
     const permissions = req[permissionsKey as keyof Request];
     if (!permissions) {
-      throw AuthError.throw_error("INVALID_PERMISSIONS");
+      throw AuthError.throw_error('INVALID_PERMISSIONS');
     }
     return permissions;
   }
@@ -51,24 +44,24 @@ class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
       try {
         let authorized = false;
         if (!options.usePermissionKey) {
-          const role = this._getRoleFromRequest(req, options.roleKey || "role");
+          const role = this._getRoleFromRequest(req, options.roleKey || 'role');
           authorized = this.authorizeRole({
             role,
             action: options.action,
             resource: options.resource,
-            loose: options.loose,
+            loose: options.loose
           });
         } else {
           const permissions = this._getPermissionsFromRequest(
             req,
-            options.permissionsKey || "permissions"
+            options.permissionsKey || 'permissions'
           );
           authorized = this.authorizeRole({
             permissions,
             action: options.action,
             resource: options.resource,
             loose: options.loose,
-            constructRole: true,
+            constructRole: true
           });
         }
         if (authorized) {
@@ -78,7 +71,7 @@ class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
             next();
           }
         } else {
-          throw AuthError.throw_error("UNAUTHORIZED");
+          throw AuthError.throw_error('UNAUTHORIZED');
         }
       } catch (error: any) {
         if (this.onError) {
@@ -92,8 +85,4 @@ class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
 }
 
 export { ExpressRoleManager };
-export type {
-  IExpressRoleManager,
-  IExpressRoleManagerOptions,
-  IExpressAutorizeOptions,
-};
+export type { IExpressRoleManager, IExpressRoleManagerOptions, IExpressAutorizeOptions };

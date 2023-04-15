@@ -1,6 +1,6 @@
-export { ExpressRoleManager } from "./lib";
+export { ExpressRoleManager } from './lib';
 export type {
   IExpressRoleManager,
   IExpressRoleManagerOptions,
-  IExpressAutorizeOptions,
-} from "./lib";
+  IExpressAutorizeOptions
+} from './lib';

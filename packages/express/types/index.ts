@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from "express";
-import { IAuthManager, IRole, permission, AuthError } from "@iamjs/core";
+import { NextFunction, Request, Response } from 'express';
+import { IAuthManager, IRole, permission, AuthError } from '@iamjs/core';
 
 /**
  * We used declaration merging to add the `role` and `permissions` keys to the `Request` interface
@@ -78,11 +78,7 @@ interface IExpressRoleManager extends IAuthManager {
   /**
    * The function that is called when the authorization is successful
    */
-  onSucess?: <T extends Request, U extends Response>(
-    req: T,
-    res: U,
-    next: NextFunction
-  ) => void;
+  onSucess?: <T extends Request, U extends Response>(req: T, res: U, next: NextFunction) => void;
 }
 
 /**
@@ -111,15 +107,7 @@ interface IExpressRoleManagerOptions {
   /**
    * The function that is called when the authorization is successful
    */
-  onSucess?: <T extends Request, U extends Response>(
-    req: T,
-    res: U,
-    next: NextFunction
-  ) => void;
+  onSucess?: <T extends Request, U extends Response>(req: T, res: U, next: NextFunction) => void;
 }
 
-export type {
-  IExpressRoleManager,
-  IExpressRoleManagerOptions,
-  IExpressAutorizeOptions,
-};
+export type { IExpressRoleManager, IExpressRoleManagerOptions, IExpressAutorizeOptions };

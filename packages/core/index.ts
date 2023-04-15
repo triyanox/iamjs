@@ -1,4 +1,4 @@
-export { AuthError, AuthManager, Role } from "./lib";
+export { AuthError, AuthManager, Role } from './lib';
 export type {
   ErrorCodes,
   IAuthManager,
@@ -9,5 +9,5 @@ export type {
   extendOpts,
   permission,
   permissions,
-  scopes,
-} from "./lib";
+  scopes
+} from './lib';

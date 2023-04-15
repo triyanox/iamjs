@@ -1,26 +1,26 @@
-const { resolve } = require("path");
-import dts from "vite-plugin-dts";
+const { resolve } = require('path');
+import dts from 'vite-plugin-dts';
 
 module.exports = {
   build: {
     lib: {
-      entry: resolve(__dirname, "index.tsx"),
-      name: "@iamjs/react",
-      fileName: "index",
-      formats: ["cjs", "es", "umd"],
-    },
+      entry: resolve(__dirname, 'index.tsx'),
+      name: '@iamjs/react',
+      fileName: 'index',
+      formats: ['cjs', 'es', 'umd']
+    }
   },
   plugins: [
     dts({
-      outputDir: "dist",
-    }),
+      outputDir: 'dist'
+    })
   ],
   rollupOptions: {
-    external: ["react"],
+    external: ['react'],
     output: {
       globals: {
-        react: "React",
-      },
-    },
-  },
+        react: 'React'
+      }
+    }
+  }
 };

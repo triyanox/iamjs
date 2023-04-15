@@ -1,5 +1,5 @@
-import { IRole, permission, permissions } from "@iamjs/core";
-import { ReactNode } from "react";
+import { IRole, permission, permissions } from '@iamjs/core';
+import { ReactNode } from 'react';
 
 interface PermissionProviderProps {
   children: ReactNode;
@@ -35,10 +35,7 @@ interface PermissionContextType {
    * ```
    * @returns The value of the requested permission(s), or an object containing all permissions for the resource.
    */
-  getPerm: (
-    resource: string,
-    permission?: permissions
-  ) => boolean | Record<string, boolean>;
+  getPerm: (resource: string, permission?: permissions) => boolean | Record<string, boolean>;
 
   /**
    * Sets the initial set of permissions based on the provided `IRole` object.
@@ -51,9 +48,7 @@ interface PermissionContextType {
    * @param type The type of representation to generate.
    * @returns The JSON or object representation of the current set of permissions.
    */
-  generate: (
-    type: "json" | "object"
-  ) => Record<string, Record<permission, boolean>> | string;
+  generate: (type: 'json' | 'object') => Record<string, Record<permission, boolean>> | string;
   /**
    * Show a component if the user has the specified permission(s).
    * @param resource The resource for which to get permissions.
@@ -97,10 +92,7 @@ type usePermType = {
    * ```
    * @returns The value of the requested permission(s), or an object containing all permissions for the resource.
    */
-  getPerm: (
-    resource: string,
-    permission?: permissions
-  ) => boolean | Record<string, boolean>;
+  getPerm: (resource: string, permission?: permissions) => boolean | Record<string, boolean>;
 
   /**
    * Sets the initial set of permissions based on the provided `IRole` object.
@@ -113,9 +105,7 @@ type usePermType = {
    * @param type The type of representation to generate.
    * @returns The JSON or object representation of the current set of permissions.
    */
-  generate: (
-    type: "json" | "object"
-  ) => Record<string, Record<permission, boolean>> | string;
+  generate: (type: 'json' | 'object') => Record<string, Record<permission, boolean>> | string;
   /**
    * Show a component if the user has the specified permission(s).
    * @param resource The resource for which to get permissions.
