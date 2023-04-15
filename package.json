@@ -14,6 +14,7 @@
     "@typescript-eslint/parser": "^5.58.0",
     "eslint": "^8.38.0",
     "lerna": "^6.6.1",
+    "prettier": "^2.8.7",
     "typescript": "^5.0.4"
   },
   "scripts": {
@@ -24,6 +25,8 @@
     "publish": "lerna publish",
     "cleanPkgs": "rm -rf packages/*/dist",
     "lint": "eslint --config .eslintrc.json packages",
-    "lint:fix": "eslint --config .eslintrc.json --fix packages"
+    "lint:fix": "eslint --config .eslintrc.json --fix packages",
+    "prettier:format": "prettier --write .",
+    "prettier:check": "prettier --check \"**/*.{ts,tsx,json}\""
   }
 }

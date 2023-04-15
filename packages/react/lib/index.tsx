@@ -1,10 +1,6 @@
-import { IRole, Role, permission, permissions } from "@iamjs/core";
-import React, { createContext, useContext, useEffect, useState } from "react";
-import {
-  PermissionContextType,
-  PermissionProviderProps,
-  usePermType,
-} from "../types";
+import { IRole, Role, permission, permissions } from '@iamjs/core';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { PermissionContextType, PermissionProviderProps, usePermType } from '../types';
 
 const PermissionContext = createContext<PermissionContextType>({
   permissions: {},
@@ -12,24 +8,18 @@ const PermissionContext = createContext<PermissionContextType>({
   getPerm: () => false,
   setInitialPerm: () => {},
   generate: () => ({}),
-  show: () => false,
+  show: () => false
 });
 
 /**
  * A React context provider that provides the current set of permissions and functions to set and get permissions.
  */
 const PermissionProvider: React.FC<PermissionProviderProps> = ({
-  children,
+  children
 }: PermissionProviderProps) => {
-  const [permissions, setPermissions] = useState<
-    Record<string, Record<permission, boolean>>
-  >({});
+  const [permissions, setPermissions] = useState<Record<string, Record<permission, boolean>>>({});
 
-  const setPerm = (
-    resource: string,
-    permission: permissions,
-    grant: boolean
-  ) => {
+  const setPerm = (resource: string, permission: permissions, grant: boolean) => {
     const newPermissions = { ...permissions };
     if (!newPermissions[resource]) {
       newPermissions[resource] = {} as Record<permission, boolean>;
@@ -45,7 +35,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
   };
 
   const getPerm = (resource: string, permission?: permissions) => {
-    const [r, ...actions] = resource.split(":");
+    const [r, ...actions] = resource.split(':');
     const grantedActions = permissions?.[r];
 
     if (!grantedActions) {
@@ -53,7 +43,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
     }
 
     if (actions.length) {
-      const actionList = actions[0].split(",");
+      const actionList = actions[0].split(',');
       return actionList.reduce((acc, curr) => {
         acc = (acc && grantedActions[curr as permission]) ?? false;
         return acc;
@@ -67,13 +57,13 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
       }, {} as Record<permission, boolean>);
     }
 
-    return grantedActions[permission ?? ("" as permission)] ?? false;
+    return grantedActions[permission ?? ('' as permission)] ?? false;
   };
 
   const setInitialPerm = (role: IRole | string) => {
     let init: IRole = {} as IRole;
 
-    if (typeof role === "string") {
+    if (typeof role === 'string') {
       init = Role.fromJSON(role);
     }
     if (role instanceof Role) {
@@ -86,13 +76,11 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
       }
     });
 
-    setPermissions(
-      init.toObject() as Record<string, Record<permission, boolean>>
-    );
+    setPermissions(init.toObject() as Record<string, Record<permission, boolean>>);
   };
 
-  const generate = (type: "json" | "object") => {
-    if (type === "json") {
+  const generate = (type: 'json' | 'object') => {
+    if (type === 'json') {
       return JSON.stringify(permissions);
     }
 
@@ -100,7 +88,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
   };
 
   const show = (resource: string, permission?: permissions): boolean => {
-    const [r, ...actions] = resource.split(":");
+    const [r, ...actions] = resource.split(':');
     const grantedActions = permissions?.[r];
 
     if (!grantedActions) {
@@ -108,7 +96,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
     }
 
     if (actions.length) {
-      const actionList = actions[0].split(",");
+      const actionList = actions[0].split(',');
       return actionList.reduce((acc, curr) => {
         acc = (acc && grantedActions[curr as permission]) ?? false;
         return acc;
@@ -122,7 +110,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
       }, true);
     }
 
-    return grantedActions[permission ?? ("" as permission)] ?? false;
+    return grantedActions[permission ?? ('' as permission)] ?? false;
   };
 
   return (
@@ -154,7 +142,7 @@ const usePerm = (role?: IRole | string): usePermType => {
     getPerm,
     load: setInitialPerm,
     generate,
-    show,
+    show
   };
 };
 

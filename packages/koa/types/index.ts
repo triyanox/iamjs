@@ -1,5 +1,5 @@
-import { Context, Next } from "koa";
-import { AuthError, IAuthManager, IRole, permission } from "@iamjs/core";
+import { Context, Next } from 'koa';
+import { AuthError, IAuthManager, IRole, permission } from '@iamjs/core';
 
 /**
  * The interface for the `authorize` function
@@ -46,11 +46,7 @@ interface IKoaRoleManager extends IAuthManager {
   authorize: <T extends Context>(
     options: IKoaAutorizeOptions
   ) => (ctx: T, next: Next) => Promise<void> | void;
-  onError?: <T extends Context>(
-    err: AuthError,
-    ctx: T,
-    next: Next
-  ) => Promise<void> | void;
+  onError?: <T extends Context>(err: AuthError, ctx: T, next: Next) => Promise<void> | void;
   onSucess?: <T extends Context>(ctx: T, next: Next) => Promise<void> | void;
 }
 
@@ -70,11 +66,7 @@ interface IKoaRoleManagerOptions {
   /**
    * The function that is called when an error occurs
    */
-  onError?: <T extends Context>(
-    err: AuthError,
-    ctx: T,
-    next: Next
-  ) => Promise<void> | void;
+  onError?: <T extends Context>(err: AuthError, ctx: T, next: Next) => Promise<void> | void;
   /**
    * The function that is called when the authorization is successful
    */

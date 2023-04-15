@@ -6,10 +6,7 @@ type Concat<T extends string, U extends string> = `${T}${U}`;
 /**
  * Scopes type
  */
-type scopes = Concat<
-  "c" | "-",
-  Concat<"r" | "-", Concat<"u" | "-", Concat<"d" | "-", "l" | "-">>>
->;
+type scopes = Concat<'c' | '-', Concat<'r' | '-', Concat<'u' | '-', Concat<'d' | '-', 'l' | '-'>>>>;
 
 /**
  * Permission interface
@@ -22,22 +19,20 @@ interface IPermission {
 /**
  * Permission type
  */
-type permission = "create" | "read" | "update" | "delete" | "list";
+type permission = 'create' | 'read' | 'update' | 'delete' | 'list';
 
 /**
  * Permissions type
  */
 type permissions =
-  | "create"
-  | "read"
-  | "update"
-  | "delete"
-  | "list"
-  | ("create" | "read" | "update" | "delete" | "list")[];
+  | 'create'
+  | 'read'
+  | 'update'
+  | 'delete'
+  | 'list'
+  | ('create' | 'read' | 'update' | 'delete' | 'list')[];
 
-type extendOpts =
-  | { overwrite?: boolean; permissions?: IPermission[] }
-  | IPermission[];
+type extendOpts = { overwrite?: boolean; permissions?: IPermission[] } | IPermission[];
 
 /**
  * Role interface
@@ -107,7 +102,7 @@ interface IRole {
    * Generates a a javascript object or json string of the role with all the permissions
    * @param format - Format to return the role in ( json or object )
    */
-  generate(format: "json" | "object"): Object | string;
+  generate(format: 'json' | 'object'): Object | string;
   /**
    * Extends the role with another role
    */
@@ -180,14 +175,14 @@ interface IAuthManager {
 }
 
 type ErrorCodes =
-  | "INVALID_ROLE"
-  | "INVALID_RESOURCE"
-  | "INVALID_PERMISSION"
-  | "INVALID_PERMISSIONS"
-  | "NO_PERMISSIONS"
-  | "MISSING_RESOURCE"
-  | "MISSING_ACTION"
-  | "UNAUTHORIZED";
+  | 'INVALID_ROLE'
+  | 'INVALID_RESOURCE'
+  | 'INVALID_PERMISSION'
+  | 'INVALID_PERMISSIONS'
+  | 'NO_PERMISSIONS'
+  | 'MISSING_RESOURCE'
+  | 'MISSING_ACTION'
+  | 'UNAUTHORIZED';
 
 export {
   IPermission,
@@ -199,5 +194,5 @@ export {
   permissions,
   scopes,
   extendOpts,
-  ErrorCodes,
+  ErrorCodes
 };
