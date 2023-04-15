@@ -174,6 +174,8 @@ The `AuthManager` class constructor takes an object with the following propertie
 | `roles` | `{ [key: string]: Role }` | An object containing the roles. |
 | `resources` | `[string]` | An array of resources. |
 
+Example:
+
 ```ts
 import { AuthManager, Role } from '@iamjs/core';
 
@@ -210,6 +212,8 @@ The `authorizeRole` method takes an object with the following properties.
 | `constructRole` | `boolean` | A flag to construct the role if it doesn't exist. |
 | `permissions` | `{ [key: string]: string }` | An object containing the permissions to construct the role. |
 | `loose` | `boolean` | A flag to allow loose authorization. |
+
+Example:
 
 ```ts
 import { AuthManager, Role } from '@iamjs/core';
