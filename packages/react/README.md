@@ -36,7 +36,7 @@ The `usePerm` hook returns an object with the following properties:
 
 | Property | Type | Description |
 | --- | --- | --- |
-| `getPerm` | `(resource: string, permission: string \| string[]) => boolean | Record<string, boolean>` | Get permission or permission for a resource. |
+| `getPerm` | `(resource: string, permission: string \| string[]) => boolean \| Record<string, boolean>` | Get permission or permission for a resource. |
 | `setPerm` | `(resource: string, permission: string \| string[], grant: boolean) => void` | Set permission or permission for a resource. |
 | `show` | `(resource: string, scope: string \| string[]) => boolean` | Show component based on permission. |
 | `load` | `(role: Role \| RoleJSON) => void` | Load role. |

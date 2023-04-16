@@ -27,7 +27,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
     if (typeof role === 'string') {
       init = Role.fromJSON(role);
     }
-    if (role instanceof Role) {
+    if (typeof role === 'object') {
       init = role;
     }
 
