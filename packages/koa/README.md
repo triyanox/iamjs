@@ -63,7 +63,7 @@ const router = new Router();
 
 const roleManager = new KoaRoleManager({
   roles: {
-    user,
+    user: role,
   },
   resources: ['user', 'post'],
 });
@@ -125,7 +125,7 @@ const role = new Role([
 
 const roleManager = new KoaRoleManager({
   roles: {
-    user,
+    user: role,
   },
   resources: ['user', 'post'],
 });
@@ -186,7 +186,7 @@ const role = new Role([
 
 const roleManager = new KoaRoleManager({
   roles: {
-    user,
+    user: role,
   },
   resources: ['post', 'post'],
   onError: (err, ctx, next) => {
@@ -259,7 +259,7 @@ interface CustomContext extends Context {
 
 const roleManager = new KoaRoleManager({
   roles: {
-    user,
+    user: role,
   },
   resources: ['user', 'post'],
   onSuccess : <CustomContext>(ctx, next) => {

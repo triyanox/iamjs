@@ -59,7 +59,7 @@ const role = new Role([
 
 const roleManager = new ExpressRoleManager({
   roles: {
-    user,
+    user: role,
   },
   resources: ['user', 'post'],
 });
@@ -117,7 +117,7 @@ const role = new Role([
 
 const roleManager = new ExpressRoleManager({
   roles: {
-    user,
+    user: role,
   },
   resources: ['user', 'post'],
 });
@@ -172,7 +172,7 @@ const role = new Role([
 
 const roleManager = new ExpressRoleManager({
   roles: {
-    user,
+    user: role,
   },
   resources: ['user', 'post'],
   onSuccess: (req, res, next) => {
@@ -234,7 +234,7 @@ const role = new Role([
 
 const roleManager = new ExpressRoleManager({
   roles: {
-    user,
+    user: role,
   },
   resources: ['user', 'post'],
   onSuccess : <express.Request, express.Response>(req, res, next) => {

@@ -57,7 +57,7 @@ const role = new Role([
 
 const roleManager = new NextRoleManager({
   roles: {
-    user,
+    user: role,
   },
   resources: ['user', 'post'],
 });
@@ -117,7 +117,7 @@ const role = new Role([
 
 const roleManager = new NextRoleManager({
   roles: {
-    user,
+    user: role,
   },
   resources: ['user', 'post'],
 });
@@ -170,7 +170,7 @@ const role = new Role([
 
 const roleManager = new NextRoleManager({
   roles: {
-    user,
+    user: role,
   },
   resources: ['user', 'post'],
   onSuccess: (req, res) => {
@@ -237,7 +237,7 @@ interface Response extends NextApiResponse {}
 
 const roleManager = new NextRoleManager({
   roles: {
-    user,
+    user: role,
   },
   resources: ['user', 'post'],
   onSuccess: <Request, Response>(req, res) => {
