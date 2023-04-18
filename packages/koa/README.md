@@ -14,7 +14,6 @@ This package contains the koa middleware for iamjs a library for easy role and p
   - [TypeScript support](#typescript-support)
 - [License](#license)
 
-
 ## Installation
 
 ```bash
