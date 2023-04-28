@@ -12,7 +12,7 @@ You can install `iamjs` using one of the following packages:
 
 [`@iamjs/express`](broken-reference) 🚀 - for express middleware
 
-[`@iamjs/koa`](broken-reference) 🐱‍🏍 - for koa middleware
+[`@iamjs/koa`](broken-reference) 🐱‍- for koa middleware
 
 [`@iamjs/next`](broken-reference) ⏭ - for next.js middleware
 
