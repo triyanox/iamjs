@@ -4,6 +4,11 @@
 type Concat<T extends string, U extends string> = `${T}${U}`;
 
 /**
+ * Permissions Object type
+ */
+type PermissionsObject = Record<string, Record<permission, boolean>>;
+
+/**
  * Scopes type
  */
 type scopes = Concat<'c' | '-', Concat<'r' | '-', Concat<'u' | '-', Concat<'d' | '-', 'l' | '-'>>>>;
@@ -102,7 +107,7 @@ interface IRole {
    * Generates a a javascript object or json string of the role with all the permissions
    * @param format - Format to return the role in ( json or object )
    */
-  generate(format: 'json' | 'object'): Object | string;
+  generate(format: 'json' | 'object'): PermissionsObject | string;
   /**
    * Extends the role with another role
    */
@@ -114,7 +119,11 @@ interface IRole {
   /**
    * `toObject` method to generate a javascript object of the role
    */
-  toObject(): Object;
+  toObject(): PermissionsObject;
+  /**
+   * Get all resources that the role has access to
+   */
+  getResources(): string[];
 }
 
 /**
@@ -140,7 +149,7 @@ interface IAutorizeOptions {
   /**
    * The permissions to be used to construct the role an Object with all the permissions of the role
    */
-  permissions?: any;
+  permissions?: PermissionsObject;
   /**
    * If the permissions should be checked in a loose way
    * @default false
@@ -194,5 +203,6 @@ export {
   permissions,
   scopes,
   extendOpts,
-  ErrorCodes
+  ErrorCodes,
+  PermissionsObject
 };

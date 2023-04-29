@@ -8,7 +8,8 @@ import {
   extendOpts,
   permission,
   permissions,
-  scopes
+  scopes,
+  PermissionsObject
 } from '../types';
 import AuthError from './AuthError';
 import Role from './Role';
@@ -25,5 +26,6 @@ export type {
   extendOpts,
   permission,
   permissions,
-  scopes
+  scopes,
+  PermissionsObject
 };
