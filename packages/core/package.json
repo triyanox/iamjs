@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/core",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "This package contains the core logic and interfaces for the authorization library.",
   "keywords": [
     "iamjs",
