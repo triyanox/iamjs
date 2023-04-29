@@ -5,7 +5,7 @@ This package is written in typescript and has type definitions for all the expor
 Example:
 
 ```ts
-import { Role } from '@iamjs/core';
+import { Role, permission } from '@iamjs/core';
 import { NextRoleManager } from '@iamjs/next';
 import next, { NextApiRequest, NextApiResponse, NextApiHandler } from 'next';
 
@@ -22,7 +22,7 @@ const role = new Role([
 
 interface Request extends NextApiRequest {
   role: string;
-  permissions: Record<string, string>;
+  permissions: Record<string, Record<permission, boolean>>;
 }
 
 interface Response extends NextApiResponse {}

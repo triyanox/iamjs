@@ -22,7 +22,7 @@ You can use the [`@iamjs/core`](broken-reference) 🧠 package, which contains a
 
 ### Contributing
 
-Contributions are welcome! Please read the contributing guide for more information.
+Contributions are welcome! Please read the [contributing guide](../CONTRIBUTING.md) for more information.
 
 ### License
 

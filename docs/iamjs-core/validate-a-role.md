@@ -15,12 +15,10 @@ const role = new Role([
 Role.validate(role); // true
 
 // or you can use a callback
-
 role.validate(role, (result, error) => {
   if (error) {
     console.log(error);
-  } else {
-    console.log(result); // true
-  }
+  } 
+  console.log(result); // true
 });
 ```

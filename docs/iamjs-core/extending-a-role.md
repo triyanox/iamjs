@@ -21,8 +21,6 @@ console.log(extendedRole.canUpdate('user')); // false
 and you can additional permissions to the role using `addPermissions` method.
 
 ```ts
-import { Role } from '@iamjs/core';
-
 extendedRole.addPermissions([
   {
     resource: 'post',

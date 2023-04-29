@@ -21,7 +21,7 @@ const App = () => {
 };
 
 const Component = () => {
-  const { getPerm } = usePerm(role);
+  const { show } = usePerm(role);
 
   return (
     <>

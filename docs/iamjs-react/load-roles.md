@@ -23,7 +23,7 @@ const App = () => {
 const Component = () => {
   const { load } = usePerm();
   // or you can directly pass the role to usePerm hook
-  // const { show } = usePerm(role);
+  const { ... } = usePerm(role);
 
   const handleLoadRole = () => {
     load(role);
