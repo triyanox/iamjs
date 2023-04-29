@@ -1,4 +1,12 @@
-import { IPermission, IRole, extendOpts, permission, permissions, scopes } from '../types';
+import {
+  IPermission,
+  IRole,
+  PermissionsObject,
+  extendOpts,
+  permission,
+  permissions,
+  scopes
+} from '../types';
 
 /**
  * Role class
@@ -152,7 +160,7 @@ export default class Role implements IRole {
     return this;
   }
 
-  public generate(format: 'json' | 'object' = 'json'): string | object {
+  public generate(format: 'json' | 'object' = 'json'): string | PermissionsObject {
     const Object: any = {};
 
     this.permissions.forEach((permission) => {
@@ -177,14 +185,14 @@ export default class Role implements IRole {
   }
 
   public toObject() {
-    return this.generate('object') as object;
+    return this.generate('object') as PermissionsObject;
   }
 
   /**
    * Load a role from a json string
    * @param json - Json string to load
    */
-  public static fromJSON(json: string): IRole {
+  public static fromJSON(json: string) {
     const object = JSON.parse(json);
     return Role.fromObject(object);
   }
@@ -193,12 +201,12 @@ export default class Role implements IRole {
    * Load a role from a javascript object
    * @param object - Object to load
    */
-  public static fromObject(object: { [key: string]: any }): IRole {
+  public static fromObject(o: PermissionsObject) {
     const permissions: IPermission[] = [];
-    Object.keys(object).forEach((resource) => {
+    Object.keys(o).forEach((resource) => {
       let scopes = '';
-      Object.keys(object[resource]).forEach((scope) => {
-        if (object[resource][scope]) {
+      Object.keys(o[resource]).forEach((scope) => {
+        if (o[resource][scope as permission]) {
           scopes += scope[0];
         } else {
           scopes += '-';
@@ -243,5 +251,13 @@ export default class Role implements IRole {
       throw new Error('Scopes must be in the format of crudl');
     }
     return true;
+  }
+
+  public getResources(): string[] {
+    const resources = new Set<string>();
+    this.permissions.forEach((permission) => {
+      resources.add(permission.resource);
+    });
+    return Array.from(resources);
   }
 }

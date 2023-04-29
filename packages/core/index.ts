@@ -9,5 +9,6 @@ export type {
   extendOpts,
   permission,
   permissions,
-  scopes
+  scopes,
+  PermissionsObject
 } from './lib';

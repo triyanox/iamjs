@@ -11,7 +11,7 @@ declare global {
   namespace Express {
     interface Request {
       role: string;
-      permissions: any;
+      permissions: Record<string, Record<permission, boolean>>;
     }
   }
 }
