@@ -232,7 +232,7 @@ This package is written in typescript and has type definitions for all the expor
 Example:
 
 ```ts
-import { Role } from '@iamjs/core';
+import { Role, permission } from '@iamjs/core';
 import { KoaRoleManager } from '@iamjs/koa';
 import koa, { Context, Next } from 'koa';
 import Router from 'koa-router';
@@ -253,7 +253,7 @@ const role = new Role([
 
 interface CustomContext extends Context {
   role: string;
-  permissions: Record<string, string>;
+  permissions: Record<string, Record<permission, boolean>>;
 }
 
 const roleManager = new KoaRoleManager({

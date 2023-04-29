@@ -163,9 +163,8 @@ Role.validate(role); // true
 role.validate(role, (result, error) => {
   if (error) {
     console.log(error);
-  } else {
-    console.log(result); // true
-  }
+  } 
+  console.log(result); // true
 });
 ```
 
