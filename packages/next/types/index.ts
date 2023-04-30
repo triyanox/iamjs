@@ -2,7 +2,7 @@ import { AuthError, IAuthManager, IRole, permission } from '@iamjs/core';
 import { NextApiRequest, NextApiResponse } from 'next';
 
 /**
- * The interface for the `authorize` function
+ * The interface for the `authorize` method
  */
 interface INextAutorizeOptions {
   /**
@@ -35,28 +35,64 @@ interface INextAutorizeOptions {
 }
 
 /**
+ * The options for the `onActivity` method
+ */
+type ActivityCallbackOptions<T extends NextApiRequest> = {
+  /**
+   * The action or actions that are authorized to be executed on the resource
+   */
+  action?: permission | permission[];
+  /**
+   * The resource or resources that are authorized to be accessed
+   */
+  resource?: string | string[];
+  /**
+   * The role that is used to authorize the request
+   */
+  role?: string;
+  /**
+   * The permissions that are used to authorize the request
+   */
+  success?: boolean;
+  /**
+   * The request object
+   */
+  req?: T;
+};
+
+/**
  * The interface for the `NextRoleManager` class
  * @extends IAuthManager
  */
 interface INextRoleManager extends IAuthManager {
   /**
-   * The function that is used to authorize a request
-   * This function takes some options as first argument and a `NextApiHandler` as second argument
+   * The method that is used to authorize a request
+   * This method takes some options as first argument and a `NextApiHandler` as second argument
    * @param options The options for authorization
    */
   authorize: <T extends NextApiRequest, U extends NextApiResponse>(
     options: INextAutorizeOptions,
     handler: (req: T, res: U) => Promise<void> | void
   ) => (req: T, res: U) => Promise<void> | void;
+  /**
+   * The method that is called when an error occurs
+   */
   onError?: <T extends NextApiRequest, U extends NextApiResponse>(
     err: AuthError,
     req: T,
     res: U
   ) => Promise<void> | void;
+  /**
+   * The method that is called when the authorization is successful
+   */
   onSucess?: <T extends NextApiRequest, U extends NextApiResponse>(
     req: T,
     res: U
   ) => Promise<void> | void;
+  /**
+   * The method that is called when an activity is performed
+   */
+  onActivity?: <T extends NextApiRequest>(options: ActivityCallbackOptions<T>) => Promise<void>;
 }
 
 /**
@@ -74,7 +110,7 @@ interface INextRoleManagerOptions {
    */
   resources: string[];
   /**
-   * The function that is called when an error occurs
+   * The method that is called when an error occurs
    */
   onError?: <T extends NextApiRequest, U extends NextApiResponse>(
     err: AuthError,
@@ -82,12 +118,21 @@ interface INextRoleManagerOptions {
     res: U
   ) => Promise<void> | void;
   /**
-   * The function that is called when the request is authorized
+   * The method that is called when the request is authorized
    */
   onSucess?: <T extends NextApiRequest, U extends NextApiResponse>(
     req: T,
     res: U
   ) => Promise<void> | void;
+  /**
+   * The method that is called when an activity is performed
+   */
+  onActivity?: <T extends NextApiRequest>(options: ActivityCallbackOptions<T>) => Promise<void>;
 }
 
-export type { INextAutorizeOptions, INextRoleManager, INextRoleManagerOptions };
+export type {
+  INextAutorizeOptions,
+  INextRoleManager,
+  INextRoleManagerOptions,
+  ActivityCallbackOptions
+};

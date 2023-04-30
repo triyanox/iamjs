@@ -1,15 +1,26 @@
 import { AuthError, AuthManager } from '@iamjs/core';
-import { IKoaAutorizeOptions, IKoaRoleManager, IKoaRoleManagerOptions } from '../types';
 import { Context, Next } from 'koa';
+import {
+  ActivityCallbackOptions,
+  IKoaAutorizeOptions,
+  IKoaRoleManager,
+  IKoaRoleManagerOptions
+} from '../types';
 
+/**
+ * The class that is used to manage roles and permissions for `Koa`
+ * @extends AuthManager
+ */
 class KoaRoleManager extends AuthManager implements IKoaRoleManager {
   onError?: <T extends Context>(err: AuthError, ctx: T, next: Next) => Promise<void> | void;
   onSucess?: <T extends Context>(ctx: T, next: Next) => Promise<void> | void;
+  onActivity?: <T extends Context>(options: ActivityCallbackOptions<T>) => Promise<void>;
 
   constructor(options: IKoaRoleManagerOptions) {
     super(options);
     this.onError = options.onError;
     this.onSucess = options.onSucess;
+    this.onActivity = options.onActivity;
   }
 
   private _getRoleFromRequest(ctx: Context, roleKey: string): string {
@@ -55,8 +66,15 @@ class KoaRoleManager extends AuthManager implements IKoaRoleManager {
             constructRole: true
           });
         }
-        if (!authorized) {
-          throw AuthError.throw_error('UNAUTHORIZED');
+        if (!authorized) throw AuthError.throw_error('UNAUTHORIZED');
+        if (this.onActivity) {
+          await this.onActivity<T>({
+            ctx,
+            action: options.action,
+            resource: options.resource,
+            role: this._getRoleFromRequest(ctx, options.roleKey || 'role'),
+            success: true
+          });
         }
         if (this.onSucess) {
           this.onSucess<T>(ctx, next);
@@ -64,6 +82,15 @@ class KoaRoleManager extends AuthManager implements IKoaRoleManager {
           await next();
         }
       } catch (err: any) {
+        if (this.onActivity) {
+          await this.onActivity<T>({
+            ctx,
+            action: options.action,
+            resource: options.resource,
+            role: this._getRoleFromRequest(ctx, options.roleKey || 'role'),
+            success: false
+          });
+        }
         if (this.onError) {
           this.onError<T>(err, ctx, next);
         } else {
@@ -75,4 +102,9 @@ class KoaRoleManager extends AuthManager implements IKoaRoleManager {
 }
 
 export { KoaRoleManager };
-export type { IKoaRoleManager, IKoaRoleManagerOptions, IKoaAutorizeOptions };
+export type {
+  IKoaAutorizeOptions,
+  IKoaRoleManager,
+  IKoaRoleManagerOptions,
+  ActivityCallbackOptions
+};
