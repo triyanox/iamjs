@@ -1,7 +1,16 @@
-import { NextFunction, Request, Response } from 'express';
 import { AuthError, AuthManager } from '@iamjs/core';
-import { IExpressAutorizeOptions, IExpressRoleManager, IExpressRoleManagerOptions } from '../types';
+import { NextFunction, Request, Response } from 'express';
+import {
+  ActivityCallbackOptions,
+  IExpressAutorizeOptions,
+  IExpressRoleManager,
+  IExpressRoleManagerOptions
+} from '../types';
 
+/**
+ * The class that is used to manage roles and permissions from `Express.js`
+ * @extends AuthManager
+ */
 class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
   onError?: <T extends Request, U extends Response = Response>(
     err: AuthError,
@@ -14,11 +23,13 @@ class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
     res: U,
     next: NextFunction
   ) => void;
+  onActivity?: <T extends Request>(options: ActivityCallbackOptions<T>) => Promise<void>;
 
   constructor(options: IExpressRoleManagerOptions) {
     super(options);
     this.onError = options.onError;
     this.onSucess = options.onSucess;
+    this.onActivity = options.onActivity;
   }
 
   private _getRoleFromRequest(req: Request, roleKey: string): string {
@@ -65,6 +76,22 @@ class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
           });
         }
         if (authorized) {
+          if (this.onActivity) {
+            this.onActivity<T>({
+              action: options.action,
+              resource: options.resource,
+              role: this._getRoleFromRequest(req, options.roleKey || 'role'),
+              success: true,
+              req
+            }).then(() => {
+              if (this.onSucess) {
+                this.onSucess<T, U>(req, res, next);
+              } else {
+                next();
+              }
+            });
+            return;
+          }
           if (this.onSucess) {
             this.onSucess<T, U>(req, res, next);
           } else {
@@ -74,6 +101,22 @@ class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
           throw AuthError.throw_error('UNAUTHORIZED');
         }
       } catch (error: any) {
+        if (this.onActivity) {
+          this.onActivity<T>({
+            action: options.action,
+            resource: options.resource,
+            role: this._getRoleFromRequest(req, options.roleKey || 'role'),
+            success: false,
+            req
+          }).then(() => {
+            if (this.onError) {
+              this.onError<T, U>(error, req, res, next);
+            } else {
+              next(error);
+            }
+          });
+          return;
+        }
         if (this.onError) {
           this.onError<T, U>(error, req, res, next);
         } else {
@@ -85,4 +128,9 @@ class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
 }
 
 export { ExpressRoleManager };
-export type { IExpressRoleManager, IExpressRoleManagerOptions, IExpressAutorizeOptions };
+export type {
+  ActivityCallbackOptions,
+  IExpressAutorizeOptions,
+  IExpressRoleManager,
+  IExpressRoleManagerOptions
+};

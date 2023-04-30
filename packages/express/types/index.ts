@@ -17,7 +17,7 @@ declare global {
 }
 
 /**
- * The interface for the `authorize` function
+ * The interface for the `authorize` method
  */
 interface IExpressAutorizeOptions {
   /**
@@ -51,12 +51,38 @@ interface IExpressAutorizeOptions {
 }
 
 /**
+ * The options for the `onActivity` method
+ */
+type ActivityCallbackOptions<T extends Request = Request> = {
+  /**
+   * The action or actions that are authorized to be executed on the resource
+   */
+  action?: permission | permission[];
+  /**
+   * The resource or resources that are authorized to be accessed
+   */
+  resource?: string | string[];
+  /**
+   * The role that is used to authorize the request
+   */
+  role?: string;
+  /**
+   * The permissions that are used to authorize the request
+   */
+  success?: boolean;
+  /**
+   * The request object
+   */
+  req?: T;
+};
+
+/**
  * The interface for the `ExpressRoleManager` class
  * @extends IAuthManager
  */
 interface IExpressRoleManager extends IAuthManager {
   /**
-   * The function that is used to authorize a request
+   * The method that is used to authorize a request
    * ***********************************************************************************************
    * We used declaration merging to add the `role` and `permissions` keys to the `Request` interface
    * @see https://www.typescriptlang.org/docs/handbook/declaration-merging.html
@@ -67,7 +93,7 @@ interface IExpressRoleManager extends IAuthManager {
     options: IExpressAutorizeOptions
   ) => (req: T, res: U, next: NextFunction) => void;
   /**
-   * The function that is called when an error occurs
+   * The method that is called when an error occurs
    */
   onError?: <T extends Request, U extends Response>(
     err: AuthError,
@@ -76,9 +102,13 @@ interface IExpressRoleManager extends IAuthManager {
     next: NextFunction
   ) => void;
   /**
-   * The function that is called when the authorization is successful
+   * The method that is called when the authorization is successful
    */
   onSucess?: <T extends Request, U extends Response>(req: T, res: U, next: NextFunction) => void;
+  /**
+   * The method that is called when an activity is performed
+   */
+  onActivity?: <T extends Request>(options: ActivityCallbackOptions<T>) => Promise<void>;
 }
 
 /**
@@ -96,7 +126,7 @@ interface IExpressRoleManagerOptions {
    */
   resources: string[];
   /**
-   * The function that is called when an error occurs
+   * The method that is called when an error occurs
    */
   onError?: <T extends Request, U extends Response>(
     err: AuthError,
@@ -105,9 +135,18 @@ interface IExpressRoleManagerOptions {
     next: NextFunction
   ) => void;
   /**
-   * The function that is called when the authorization is successful
+   * The method that is called when the authorization is successful
    */
   onSucess?: <T extends Request, U extends Response>(req: T, res: U, next: NextFunction) => void;
+  /**
+   * The method that is called when an activity is performed
+   */
+  onActivity?: <T extends Request>(options: ActivityCallbackOptions<T>) => Promise<void>;
 }
 
-export type { IExpressRoleManager, IExpressRoleManagerOptions, IExpressAutorizeOptions };
+export type {
+  IExpressRoleManager,
+  IExpressRoleManagerOptions,
+  IExpressAutorizeOptions,
+  ActivityCallbackOptions
+};
