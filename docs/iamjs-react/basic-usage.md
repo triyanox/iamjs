@@ -1,20 +1,14 @@
 # Basic usage
 
-You can use the `usePerm` hook to get or set permissions for a role.
+The `usePerm` hook from `@iamjs/react` allows you to get or set permissions for a role in a React component.
 
-The `usePerm` hook returns an object with the following properties:
+To use the `usePerm` hook, first create a role object using the `Role` class from `@iamjs/core`.
 
-| Property      | Type                                                                                       | Description                                  |
-| ------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------- |
-| `getPerm`     | `(resource: string, permission: string \| string[]) => boolean \| Record<string, boolean>` | Get permission or permission for a resource. |
-| `setPerm`     | `(resource: string, permission: string \| string[], grant: boolean) => void`               | Set permission or permission for a resource. |
-| `show`        | `(resource: string, scope: string \| string[]) => boolean`                                 | Show component based on permission.          |
-| `load`        | `(role: Role \| RoleJSON) => void`                                                         | Load role.                                   |
-| `permissions` | `Record<string, Record<permission, boolean>>`                                              | Get all permissions.                         |
-| `generate`    | `(type: 'json' \| 'object')`                                                               | Generate the updated permission string.      |
+Then, wrap your component hierarchy with a `PermissionProvider` component from `@iamjs/react`.
 
-```tsx
+```jsx
 import { usePerm, PermissionProvider } from '@iamjs/react';
+import { Role } from '@iamjs/core';
 
 const role = new Role([
   {
@@ -30,7 +24,11 @@ const App = () => {
     </PermissionProvider>
   );
 };
+```
 
+In your component, use the `usePerm` hook to access the permissions for the role. The `usePerm` hook returns an object which includes: `getPerm` and `setPerm`.
+
+```jsx
 const Component = () => {
   const { setPerm, getPerm } = usePerm(role);
 
@@ -53,3 +51,20 @@ const Component = () => {
   );
 };
 ```
+
+You can use `getPerm` to check the value of a specific permission for a given resource and action. You can pass in either a string in the format `'resource:action'` or separate arguments for the resource and action.
+
+To set a permission, use `setPerm` and pass in the resource, action, and the new permission value. You can also set permissions for multiple actions at once by passing in an array of actions.
+
+Note that the `setPerm` function does not persist changes to a database or storage. If you need to persist changes, you will need to handle that separately.
+
+The `usePerm` hook returns an object with the following properties:
+
+| Property      | Type                                                                                       | Description                                  |
+| ------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------- |
+| `getPerm`     | `(resource: string, permission: string \| string[]) => boolean \| Record<string, boolean>` | Get permission or permission for a resource. |
+| `setPerm`     | `(resource: string, permission: string \| string[], grant: boolean) => void`               | Set permission or permission for a resource. |
+| `show`        | `(resource: string, scope: string \| string[]) => boolean`                                 | Show component based on permission.          |
+| `load`        | `(role: Role \| RoleJSON) => void`                                                         | Load role.                                   |
+| `permissions` | `Record<string, Record<permission, boolean>>`                                              | Get all permissions.                         |
+| `generate`    | `(type: 'json' \| 'object')`                                                               | Generate the updated permission string.      |
