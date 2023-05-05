@@ -1,22 +1,17 @@
 # Authorizing a role
 
-The `AuthManager` class exposes `authorizeRole` method that can be used to authorize a role.
+The AuthManager class exposes the `authorizeRole` method that can be used to authorize a role. This method takes an object with the following properties:
 
-The `authorizeRole` method takes an object with the following properties.
-
-| Property        | Type                        | Description                                                 |
-| --------------- | --------------------------- | ----------------------------------------------------------- |
-| `role`          | `string`                    | The name of the role.                                       |
-| `resource`      | `string or [string]`        | The name of the resource or an array of resources.          |
-| `action`        | `string or [string]`        | The name of the action or an array of actions.              |
-| `constructRole` | `boolean`                   | A flag to construct the role if it doesn't exist.           |
-| `permissions`   | `{ [key: string]: string }` | An object containing the permissions to construct the role. |
-| `loose`         | `boolean`                   | A flag to allow loose authorization.                        |
+* `role`: the name of the role to authorize.
+* `resource`: the name of the resource to authorize the role for.
+* `action`: the action or actions to authorize. This can be a string or an array of strings.
+* `constructRole` (optional): a flag that indicates whether to construct a role object from the permissions associated with the specified role name. Defaults to `false`.
+* `permissions` (optional): an object that defines the permissions associated with the role. This is only used when `constructRole` is set to `true`. If not provided, the permissions associated with the specified role name will be used.
 
 Example:
 
-```ts
-import { AuthManager, Role } from '@iamjs/core';
+```javascript
+javascriptCopy codeimport { AuthManager, Role } from '@iamjs/core';
 
 const authManager = new AuthManager({
   roles: {
@@ -42,10 +37,19 @@ authManager.authorizeRole({
   action: 'create',
 }); // true
 
+const role = new Role([
+  {
+    resource: 'user',
+    scopes: 'crud',
+  },
+]);
+
 authManager.authorizeRole({
   resource: 'user',
   action: ['create', 'read'],
   constructRole: true,
-  permissions : role.toObject(),
+  permissions: role.toObject(),
 }); // true
 ```
+
+Note that when `constructRole` is set to `true`, the `permissions` object should be generated from a role object using the `toObject` method.

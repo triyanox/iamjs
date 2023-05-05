@@ -20,6 +20,7 @@
 * [Advanced Usage](iamjs-express/advanced-usage.md)
 * [Success and Error Handling](iamjs-express/success-and-error-handling.md)
 * [Typescript Support](iamjs-express/typescript-support.md)
+* [Save users activity](iamjs-express/save-users-activity.md)
 
 ## ⚛ iamjs/react
 
@@ -36,6 +37,7 @@
 * [Advanced Usage](iamjs-next/advanced-usage.md)
 * [Success and Error Handling](iamjs-next/success-and-error-handling.md)
 * [Typescript Support](iamjs-next/typescript-support.md)
+* [Save users activity](iamjs-next/save-users-activity.md)
 
 ## 🐱 iamjs/koa
 
@@ -44,3 +46,4 @@
 * [Advanced Usage](iamjs-koa/advanced-usage.md)
 * [Success and Error Handling](iamjs-koa/success-and-error-handling.md)
 * [Typescript Support](iamjs-koa/typescript-support.md)
+* [Save users activity](iamjs-koa/save-users-activity.md)

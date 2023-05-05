@@ -2,8 +2,8 @@
 
 You can check if a role is valid using the `validate` method.
 
-```ts
-import { Role } from '@iamjs/core';
+```javascript
+javascriptCopy codeimport { Role } from '@iamjs/core';
 
 const role = new Role([
   {
@@ -15,10 +15,12 @@ const role = new Role([
 Role.validate(role); // true
 
 // or you can use a callback
-role.validate(role, (result, error) => {
+role.validate((result, error) => {
   if (error) {
     console.log(error);
   } 
   console.log(result); // true
 });
 ```
+
+The `validate` method returns `true` if the role is valid and `false` otherwise. Additionally, you can use the callback function to handle errors that may occur during the validation process.
