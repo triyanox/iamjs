@@ -14,7 +14,7 @@ export default defineConfig({
     sourcemap: true,
     lib: {
       entry: path.resolve(__dirname, 'index.ts'),
-      name: '@iamjs/next',
+      name: '@iamjs/react',
       formats: ['es', 'umd'],
       fileName: (format) => `index.${format}.js`
     },
