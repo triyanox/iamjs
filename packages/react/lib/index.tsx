@@ -4,11 +4,12 @@ import { PermissionContextType, PermissionProviderProps, usePermType } from '../
 
 const PermissionContext = React.createContext<PermissionContextType>({
   permissions: {},
-  setPerm: () => {},
+  setPerm: () => { },
   getPerm: () => false,
-  setInitialPerm: () => {},
+  setInitialPerm: () => Promise.resolve(),
   generate: () => ({}),
-  show: () => false
+  show: () => false,
+  isReady: false
 });
 
 /**
@@ -17,30 +18,34 @@ const PermissionContext = React.createContext<PermissionContextType>({
 const PermissionProvider: React.FC<PermissionProviderProps> = ({
   children
 }: PermissionProviderProps) => {
+  const [isReady, setIsReady] = React.useState<boolean>(false);
   const [permissions, setPermissions] = React.useState<Record<string, Record<permission, boolean>>>(
     {}
   );
 
-  const setInitialPerm = (role: IRole | string) => {
-    let init: IRole = {} as IRole;
-
-    if (typeof role === 'string') {
-      init = Role.fromJSON(role);
-    }
-    if (typeof role === 'object') {
-      init = role;
-    }
-
-    Role.validate(init, (result, err) => {
-      if (!result) {
-        throw err;
+  const setInitialPerm = (role: IRole | string): Promise<void> => {
+    return new Promise((resolve) => {
+      let init: IRole = {} as IRole;
+      if (typeof role === 'string') {
+        init = Role.fromJSON(role);
       }
+      if (typeof role === 'object') {
+        init = role;
+      }
+      Role.validate(init, (result, err) => {
+        if (!result) {
+          throw err;
+        }
+      });
+      setPermissions(init.toObject() as Record<string, Record<permission, boolean>>);
+      setIsReady(true);
+      resolve();
     });
 
-    setPermissions(init.toObject() as Record<string, Record<permission, boolean>>);
   };
 
   const setPerm = (resource: string, permission: permissions, grant: boolean) => {
+    if (!isReady) return
     const newPermissions = { ...permissions };
     if (!newPermissions[resource]) {
       newPermissions[resource] = {} as Record<permission, boolean>;
@@ -56,6 +61,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
   };
 
   const getPerm = (resource: string, permission?: permissions) => {
+    if (!isReady) return false;
     const [r, ...actions] = resource.split(':');
     const grantedActions = permissions?.[r];
 
@@ -82,6 +88,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
   };
 
   const generate = (type: 'json' | 'object') => {
+    if (!isReady) return type === 'json' ? '{}' : {};
     if (type === 'json') {
       return JSON.stringify(permissions);
     }
@@ -90,6 +97,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
   };
 
   const show = (resource: string, permission?: permissions): boolean => {
+    if (!isReady) return false;
     const [r, ...actions] = resource.split(':');
     const grantedActions = permissions?.[r];
 
@@ -117,7 +125,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
 
   return (
     <PermissionContext.Provider
-      value={{ permissions, generate, setPerm, getPerm, setInitialPerm, show }}
+      value={{ permissions, generate, setPerm, getPerm, setInitialPerm, show, isReady }}
     >
       {children}
     </PermissionContext.Provider>
@@ -130,7 +138,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
  * @returns {{permissions: Record<string, Record<permission, boolean>>, setPerm: Function, getPerm: Function, load: Function, generate: Function}} An object containing permission related functions and values.
  */
 const usePerm = (role?: IRole | string): usePermType => {
-  const { permissions, setPerm, getPerm, setInitialPerm, generate, show } =
+  const { permissions, setPerm, getPerm, setInitialPerm, generate, show, isReady } =
     React.useContext(PermissionContext);
   React.useEffect(() => {
     if (role) {
@@ -139,6 +147,7 @@ const usePerm = (role?: IRole | string): usePermType => {
   }, [role]);
 
   return {
+    isReady,
     permissions,
     setPerm,
     getPerm,
@@ -150,3 +159,4 @@ const usePerm = (role?: IRole | string): usePermType => {
 
 export { PermissionProvider, usePerm };
 export type { PermissionContextType, PermissionProviderProps, usePermType };
+
