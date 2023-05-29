@@ -11,7 +11,6 @@ export default defineConfig({
     })
   ],
   build: {
-    sourcemap: true,
     lib: {
       entry: path.resolve(__dirname, 'index.ts'),
       name: '@iamjs/react',
