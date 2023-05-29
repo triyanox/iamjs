@@ -41,7 +41,7 @@ interface PermissionContextType {
    * Sets the initial set of permissions based on the provided `IRole` object.
    * @param role The role object from which to derive the initial permissions.
    */
-  setInitialPerm: (role: IRole | string) => void;
+  setInitialPerm: (role: IRole | string) => Promise<void>;
 
   /**
    * Generates a JSON or object representation of the current set of permissions.
@@ -59,6 +59,11 @@ interface PermissionContextType {
    * @returns a boolean indicating whether the user can see the component.
    */
   show: (resource: string, permission?: permissions) => boolean;
+  /**
+   * A boolean indicating whether the permissions have been loaded.
+   * @default false
+   */
+  isReady: boolean;
 }
 
 /**
@@ -98,7 +103,7 @@ type usePermType = {
    * Sets the initial set of permissions based on the provided `IRole` object.
    * @param role The role object from which to derive the initial permissions.
    */
-  load: (role: IRole | string) => void;
+  load: (role: IRole | string) => Promise<void>;
 
   /**
    * Generates a JSON or object representation of the current set of permissions.
@@ -116,6 +121,11 @@ type usePermType = {
    * @returns a boolean indicating whether the user can see the component.
    */
   show: (resource: string, permission?: permissions) => boolean;
+  /**
+   * A boolean indicating whether the permissions have been loaded.
+   * @default false
+   */
+  isReady: boolean;
 };
 
 export type { PermissionContextType, PermissionProviderProps, usePermType };
