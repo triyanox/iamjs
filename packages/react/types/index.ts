@@ -1,4 +1,4 @@
-import { IRole, permission, permissions } from '@iamjs/core';
+import { Role, permission, permissions } from '@iamjs/core';
 import React from 'react';
 
 interface PermissionProviderProps {
@@ -38,10 +38,10 @@ interface PermissionContextType {
   getPerm: (resource: string, permission?: permissions) => boolean | Record<string, boolean>;
 
   /**
-   * Sets the initial set of permissions based on the provided `IRole` object.
+   * Sets the initial set of permissions based on the provided `Role` object.
    * @param role The role object from which to derive the initial permissions.
    */
-  setInitialPerm: (role: IRole | string) => Promise<void>;
+  setInitialPerm: (role: Role | string) => Promise<void>;
 
   /**
    * Generates a JSON or object representation of the current set of permissions.
@@ -100,10 +100,10 @@ type usePermType = {
   getPerm: (resource: string, permission?: permissions) => boolean | Record<string, boolean>;
 
   /**
-   * Sets the initial set of permissions based on the provided `IRole` object.
+   * Sets the initial set of permissions based on the provided `Role` object.
    * @param role The role object from which to derive the initial permissions.
    */
-  load: (role: IRole | string) => Promise<void>;
+  load: (role: Role | string) => Promise<void>;
 
   /**
    * Generates a JSON or object representation of the current set of permissions.

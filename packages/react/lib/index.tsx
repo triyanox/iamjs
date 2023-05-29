@@ -1,4 +1,4 @@
-import { IRole, Role, permission, permissions } from '@iamjs/core';
+import { Role, permission, permissions } from '@iamjs/core';
 import React from 'react';
 import { PermissionContextType, PermissionProviderProps, usePermType } from '../types';
 
@@ -23,21 +23,14 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
     {}
   );
 
-  const setInitialPerm = (role: IRole | string): Promise<void> => {
+  const setInitialPerm = (role: Role | string): Promise<void> => {
     return new Promise((resolve) => {
-      let init: IRole = {} as IRole;
       if (typeof role === 'string') {
-        init = Role.fromJSON(role);
+        setPermissions(Role.fromJSON(role).toObject() as Record<string, Record<permission, boolean>>);
       }
       if (typeof role === 'object') {
-        init = role;
+        setPermissions(role.toObject() as Record<string, Record<permission, boolean>>);
       }
-      Role.validate(init, (result, err) => {
-        if (!result) {
-          throw err;
-        }
-      });
-      setPermissions(init.toObject() as Record<string, Record<permission, boolean>>);
       setIsReady(true);
       resolve();
     });
@@ -137,7 +130,7 @@ const PermissionProvider: React.FC<PermissionProviderProps> = ({
  * @param {IRole} role - An optional role object to set initial permissions.
  * @returns {{permissions: Record<string, Record<permission, boolean>>, setPerm: Function, getPerm: Function, load: Function, generate: Function}} An object containing permission related functions and values.
  */
-const usePerm = (role?: IRole | string): usePermType => {
+const usePerm = (role?: Role | string): usePermType => {
   const { permissions, setPerm, getPerm, setInitialPerm, generate, show, isReady } =
     React.useContext(PermissionContext);
   React.useEffect(() => {
