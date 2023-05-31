@@ -11,7 +11,7 @@ The AuthManager class exposes the `authorizeRole` method that can be used to aut
 Example:
 
 ```javascript
-javascriptCopy codeimport { AuthManager, Role } from '@iamjs/core';
+import { AuthManager, Role } from '@iamjs/core';
 
 const authManager = new AuthManager({
   roles: {
