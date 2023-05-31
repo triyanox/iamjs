@@ -3,7 +3,7 @@
 You can check if a role is valid using the `validate` method.
 
 ```javascript
-javascriptCopy codeimport { Role } from '@iamjs/core';
+import { Role } from '@iamjs/core';
 
 const role = new Role([
   {
