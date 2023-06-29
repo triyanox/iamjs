@@ -1,91 +1,81 @@
-import { AuthError, AuthManager } from '@iamjs/core';
+import { AuthError, AuthManager, Roles, Schema, TAutorizeOptions } from '@iamjs/core';
 import { NextFunction, Request, Response } from 'express';
 import {
   ActivityCallbackOptions,
-  IExpressAutorizeOptions,
   IExpressRoleManager,
-  IExpressRoleManagerOptions
+  IExpressRoleManagerOptions,
+  TExpressCheckOptions
 } from '../types';
 
 /**
  * The class that is used to manage roles and permissions from `Express.js`
  * @extends AuthManager
  */
-class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
-  onError?: <T extends Request, U extends Response = Response>(
-    err: AuthError,
-    req: T,
-    res: U,
-    next: NextFunction
-  ) => void;
-  onSucess?: <T extends Request, U extends Response = Response>(
-    req: T,
-    res: U,
-    next: NextFunction
-  ) => void;
-  onActivity?: <T extends Request>(options: ActivityCallbackOptions<T>) => Promise<void>;
+class ExpressRoleManager<T extends Roles<T>>
+  extends AuthManager<T>
+  implements IExpressRoleManager<T>
+{
+  public schema: Schema<T>;
 
-  constructor(options: IExpressRoleManagerOptions) {
-    super(options);
+  onError?: <R extends Request, U extends Response = Response>(
+    err: AuthError,
+    req: R,
+    res: U,
+    next: NextFunction
+  ) => void;
+  onSucess?: <R extends Request, U extends Response = Response>(
+    req: R,
+    res: U,
+    next: NextFunction
+  ) => void;
+  onActivity?: <R extends Request>(options: ActivityCallbackOptions<T, R>) => Promise<void>;
+
+  constructor(options: IExpressRoleManagerOptions<T>) {
+    super(options.schema);
+    this.schema = options.schema;
     this.onError = options.onError;
     this.onSucess = options.onSucess;
     this.onActivity = options.onActivity;
   }
 
-  private _getRoleFromRequest(req: Request, roleKey: string): string {
-    const role = req[roleKey as keyof Request];
-    if (!role) {
-      throw AuthError.throw_error('INVALID_ROLE');
+  private _role(options: TExpressCheckOptions<T>): keyof T | 'constrcuted' {
+    if ('role' in options) {
+      return options.role as keyof T;
     }
-    return role;
+    return 'constrcuted';
   }
 
-  private _getPermissionsFromRequest(req: Request, permissionsKey: string): any {
-    const permissions = req[permissionsKey as keyof Request];
-    if (!permissions) {
-      throw AuthError.throw_error('INVALID_PERMISSIONS');
+  private async _resolveOptions(
+    req: Request,
+    options: TExpressCheckOptions<T>
+  ): Promise<TAutorizeOptions<T>> {
+    if ('data' in options) {
+      const data = await options.data(req);
+      const o = options as TAutorizeOptions<T> & { data?: string | object };
+      o.data = data;
+      return o;
     }
-    return permissions;
+    return options as TAutorizeOptions<T>;
   }
 
-  public authorize<T extends Request, U extends Response = Response>(
-    options: IExpressAutorizeOptions
-  ): (req: T, res: U, next: NextFunction) => void {
-    return (req: T, res: U, next: NextFunction) => {
+  public check<R extends Request, U extends Response>(
+    options: TExpressCheckOptions<T>
+  ): (req: R, res: U, next: NextFunction) => void {
+    return async (req: R, res: U, next: NextFunction) => {
+      const o = await this._resolveOptions(req, options);
+      const authorized = this.authorize(o);
       try {
-        let authorized = false;
-        if (!options.usePermissionKey) {
-          const role = this._getRoleFromRequest(req, options.roleKey || 'role');
-          authorized = this.authorizeRole({
-            role,
-            action: options.action,
-            resource: options.resource,
-            loose: options.loose
-          });
-        } else {
-          const permissions = this._getPermissionsFromRequest(
-            req,
-            options.permissionsKey || 'permissions'
-          );
-          authorized = this.authorizeRole({
-            permissions,
-            action: options.action,
-            resource: options.resource,
-            loose: options.loose,
-            constructRole: true
-          });
-        }
         if (authorized) {
           if (this.onActivity) {
-            this.onActivity<T>({
-              action: options.action,
-              resource: options.resource,
-              role: this._getRoleFromRequest(req, options.roleKey || 'role'),
-              success: true,
-              req
+            this.onActivity<R>({
+              actions: options.actions,
+              req,
+              resources: options.resources,
+              role: this._role(options),
+              success: true
             }).then(() => {
               if (this.onSucess) {
-                this.onSucess<T, U>(req, res, next);
+                this.onSucess<R, U>(req, res, next);
               } else {
                 next();
               }
@@ -93,7 +83,7 @@ class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
             return;
           }
           if (this.onSucess) {
-            this.onSucess<T, U>(req, res, next);
+            this.onSucess<R, U>(req, res, next);
           } else {
             next();
           }
@@ -102,15 +92,15 @@ class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
         }
       } catch (error: any) {
         if (this.onActivity) {
-          this.onActivity<T>({
-            action: options.action,
-            resource: options.resource,
-            role: this._getRoleFromRequest(req, options.roleKey || 'role'),
-            success: false,
-            req
+          this.onActivity<R>({
+            actions: options.actions,
+            req,
+            resources: options.resources,
+            role: this._role(options),
+            success: false
           }).then(() => {
             if (this.onError) {
-              this.onError<T, U>(error, req, res, next);
+              this.onError<R, U>(error, req, res, next);
             } else {
               next(error);
             }
@@ -118,7 +108,7 @@ class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
           return;
         }
         if (this.onError) {
-          this.onError<T, U>(error, req, res, next);
+          this.onError<R, U>(error, req, res, next);
         } else {
           next(error);
         }
@@ -128,9 +118,4 @@ class ExpressRoleManager extends AuthManager implements IExpressRoleManager {
 }
 
 export { ExpressRoleManager };
-export type {
-  ActivityCallbackOptions,
-  IExpressAutorizeOptions,
-  IExpressRoleManager,
-  IExpressRoleManagerOptions
-};
+export type { ActivityCallbackOptions, IExpressRoleManager, IExpressRoleManagerOptions };

@@ -1,16 +1,14 @@
-import { ErrorCodes } from '../types';
+import { AuthErrorCodes } from '../types';
 
 /**
  * The error class for the `AuthManager`
  */
 export default class AuthError extends Error {
-  code: ErrorCodes;
-  constructor(code: ErrorCodes) {
+  constructor(public code: AuthErrorCodes) {
     super(code);
-    this.code = code;
   }
 
-  public static throw_error(code: ErrorCodes): never {
+  public static throw_error(code: AuthErrorCodes): never {
     throw new AuthError(code);
   }
 

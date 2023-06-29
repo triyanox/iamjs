@@ -1,300 +1,233 @@
-import { Role } from '@iamjs/core';
+import { AuthManager, Role, Schema } from '@iamjs/core';
 
 describe('Create role and check permissions', () => {
-  const role = new Role([
-    {
-      resource: 'user',
-      scopes: 'cr---'
-    },
-    {
-      resource: 'post',
-      scopes: 'crudl'
-    },
-    {
-      resource: 'comment',
-      scopes: 'crudl'
+  const role = new Role({
+    name: 'role',
+    config: {
+      user: {
+        scopes: 'crudl',
+        custom: {
+          ban: false
+        }
+      },
+      post: {
+        scopes: '-rudl',
+        custom: {
+          publish: true
+        }
+      }
     }
-  ]);
+  });
 
   it('should create a role and check permissions', () => {
-    expect(role.canCreate('user')).toBe(true);
-    expect(role.canRead('user')).toBe(true);
-    expect(role.canUpdate('user')).toBe(false);
-    expect(role.canDelete('user')).toBe(false);
-    expect(role.canList('user')).toBe(false);
-
-    expect(role.canCreate('post')).toBe(true);
-    expect(role.canRead('post')).toBe(true);
-    expect(role.canUpdate('post')).toBe(true);
-    expect(role.canDelete('post')).toBe(true);
-    expect(role.canList('post')).toBe(true);
-
-    expect(role.canCreate('comment')).toBe(true);
-    expect(role.canRead('comment')).toBe(true);
-    expect(role.canUpdate('comment')).toBe(true);
-    expect(role.canDelete('comment')).toBe(true);
-    expect(role.canList('comment')).toBe(true);
+    expect(role.can('user', 'ban')).toBe(false);
+    expect(role.cannot('user', 'ban')).toBe(true);
+    expect(role.can('post', 'publish')).toBe(true);
+    expect(role.can('post', 'create')).toBe(false);
+    expect(role.canAny('post', ['create', 'read'])).toBe(true);
+    expect(role.canAll('post', ['create', 'read'])).toBe(false);
   });
 });
 
-describe('Extend role and check permissions', () => {
-  const user = new Role([
-    {
-      resource: 'user',
-      scopes: 'cr---'
+describe('Create role and add extra permissions', () => {
+  const role = new Role({
+    name: 'role',
+    config: {
+      user: {
+        scopes: 'crudl',
+        custom: {
+          ban: false
+        }
+      },
+      post: {
+        scopes: '-rudl',
+        custom: {
+          publish: true
+        }
+      }
     }
-  ]);
-  const admin = new Role().extend(user).addPermission({
+  });
+
+  const updated = role.add({
+    resource: 'page',
+    permissions: {
+      scopes: 'crudl',
+      custom: {
+        suspend: false
+      }
+    }
+  });
+
+  expect(updated.can('page', 'create')).toBe(true);
+  expect(updated.can('page', 'suspend')).toBe(false);
+});
+
+describe('Create role and update existing permissions', () => {
+  const role = new Role({
+    name: 'role',
+    config: {
+      user: {
+        scopes: 'crudl',
+        custom: {
+          ban: false
+        }
+      },
+      post: {
+        scopes: '-rudl',
+        custom: {
+          publish: true
+        }
+      }
+    }
+  });
+
+  const updated = role.update({
     resource: 'post',
-    scopes: 'crudl'
-  });
-
-  it('should extend a role and check permissions', () => {
-    expect(admin.canCreate('user')).toBe(true);
-    expect(admin.canRead('user')).toBe(true);
-    expect(admin.canUpdate('user')).toBe(false);
-    expect(admin.canDelete('user')).toBe(false);
-    expect(admin.canList('user')).toBe(false);
-
-    expect(admin.canCreate('post')).toBe(true);
-    expect(admin.canRead('post')).toBe(true);
-    expect(admin.canUpdate('post')).toBe(true);
-    expect(admin.canDelete('post')).toBe(true);
-    expect(admin.canList('post')).toBe(true);
-  });
-});
-
-describe("Extend role and don't overwrite permissions", () => {
-  const user = new Role([
-    {
-      resource: 'user',
-      scopes: 'cr---'
-    }
-  ]);
-  const admin = new Role().extend(user, {
-    permissions: [
-      { resource: 'post', scopes: 'crudl' },
-      { resource: 'user', scopes: '----l' }
-    ]
-  });
-
-  it("should extend a role and don't overwrite permissions", () => {
-    expect(admin.canList('user')).toBe(false);
-  });
-});
-
-describe('Extend role and overwrite permissions', () => {
-  const user = new Role([
-    {
-      resource: 'user',
-      scopes: 'cr---'
-    }
-  ]);
-
-  const admin = new Role().extend(user, {
-    overwrite: true,
-    permissions: [
-      { resource: 'post', scopes: 'crudl' },
-      { resource: 'user', scopes: 'crudl' }
-    ]
-  });
-
-  it('should extend a role and overwrite permissions', () => {
-    expect(admin.canDelete('user')).toBe(true);
-  });
-});
-
-describe('Check any permission', () => {
-  const role = new Role([
-    {
-      resource: 'user',
-      scopes: 'cr---'
-    },
-    {
-      resource: 'post',
-      scopes: 'crudl'
-    },
-    {
-      resource: 'comment',
-      scopes: 'crudl'
-    }
-  ]);
-
-  it('should check any permission', () => {
-    expect(role.canAny('create', 'user')).toBe(true);
-    expect(role.canAny('read', 'user')).toBe(true);
-    expect(role.canAny('update', 'user')).toBe(false);
-  });
-});
-
-describe('Check all permissions', () => {
-  const role = new Role([
-    {
-      resource: 'user',
-      scopes: 'cr---'
-    },
-    {
-      resource: 'post',
-      scopes: 'crudl'
-    },
-    {
-      resource: 'comment',
-      scopes: 'crudl'
-    }
-  ]);
-
-  it('should check all permissions', () => {
-    expect(role.canAll('create', 'user')).toBe(true);
-    expect(role.canAll('read', 'user')).toBe(true);
-    expect(role.canAll('update', 'user')).toBe(false);
-  });
-});
-
-describe('Check update permission', () => {
-  const role = new Role([
-    {
-      resource: 'user',
-      scopes: 'cr---'
-    },
-    {
-      resource: 'post',
-      scopes: 'crudl'
-    },
-    {
-      resource: 'comment',
-      scopes: 'crudl'
-    }
-  ]);
-
-  it('should check update permission', () => {
-    expect(role.canUpdate('user')).toBe(false);
-
-    role.updatePermission({
-      resource: 'user',
-      scopes: 'cru--'
-    });
-    expect(role.canUpdate('user')).toBe(true);
-  });
-});
-
-describe('Check delete permission', () => {
-  const role = new Role([
-    {
-      resource: 'user',
-      scopes: 'cr---'
-    },
-    {
-      resource: 'post',
-      scopes: 'crudl'
-    },
-    {
-      resource: 'comment',
-      scopes: 'crudl'
-    }
-  ]);
-
-  it('should check delete permission', () => {
-    expect(role.canCreate('user')).toBe(true);
-
-    role.removePermission('user');
-    expect(role.canCreate('user')).toBe(false);
-  });
-});
-
-describe('Test load from object', () => {
-  const role = Role.fromObject({
-    user: {
-      create: false,
-      read: false,
-      update: false,
-      delete: false,
-      list: true
-    },
-    post: { create: true, read: true, update: true, delete: true, list: true },
-    comment: {
-      create: true,
-      read: true,
-      update: true,
-      delete: true,
-      list: true
-    },
-    page: { create: true, read: true, update: true, delete: true, list: true },
-    picture: {
-      create: false,
-      read: false,
-      update: true,
-      delete: true,
-      list: true
+    permissions: {
+      scopes: 'crudl',
+      custom: {
+        suspend: false
+      }
     }
   });
 
-  it('should load from object', () => {
-    expect(role.canCreate('user')).toBe(false);
-    expect(role.canRead('user')).toBe(false);
-    expect(role.canUpdate('user')).toBe(false);
-    expect(role.canDelete('user')).toBe(false);
-    expect(role.canList('user')).toBe(true);
-
-    expect(role.canCreate('post')).toBe(true);
-    expect(role.canRead('post')).toBe(true);
-    expect(role.canUpdate('post')).toBe(true);
-    expect(role.canDelete('post')).toBe(true);
-    expect(role.canList('post')).toBe(true);
-
-    expect(role.canCreate('comment')).toBe(true);
-    expect(role.canRead('comment')).toBe(true);
-    expect(role.canUpdate('comment')).toBe(true);
-    expect(role.canDelete('comment')).toBe(true);
-    expect(role.canList('comment')).toBe(true);
-  });
+  expect(updated.can('post', 'create')).toBe(true);
+  expect(updated.can('post', 'suspend')).toBe(false);
 });
 
-describe('Test load from object json', () => {
-  const role = Role.fromObject({
-    user: {
-      create: false,
-      read: false,
-      update: false,
-      delete: false,
-      list: true
-    },
-    post: { create: true, read: true, update: true, delete: true, list: true },
-    comment: {
-      create: true,
-      read: true,
-      update: true,
-      delete: true,
-      list: true
-    },
-    page: { create: true, read: true, update: true, delete: true, list: true },
-    picture: {
-      create: false,
-      read: false,
-      update: true,
-      delete: true,
-      list: true
+describe('Create role and remove existing permissions', () => {
+  const role = new Role({
+    name: 'role',
+    config: {
+      user: {
+        scopes: 'crudl',
+        custom: {
+          ban: false
+        }
+      },
+      post: {
+        scopes: '-rudl',
+        custom: {
+          publish: true
+        }
+      }
     }
   });
 
-  const roleJson = Role.fromJSON(role.toJSON());
-
-  it('should load from object json', () => {
-    expect(roleJson.canCreate('user')).toBe(false);
-    expect(roleJson.canRead('user')).toBe(false);
-    expect(roleJson.canUpdate('user')).toBe(false);
-    expect(roleJson.canDelete('user')).toBe(false);
-    expect(roleJson.canList('user')).toBe(true);
-
-    expect(roleJson.canCreate('post')).toBe(true);
-    expect(roleJson.canRead('post')).toBe(true);
-    expect(roleJson.canUpdate('post')).toBe(true);
-    expect(roleJson.canDelete('post')).toBe(true);
-    expect(roleJson.canList('post')).toBe(true);
-
-    expect(roleJson.canCreate('comment')).toBe(true);
-    expect(roleJson.canRead('comment')).toBe(true);
-    expect(roleJson.canUpdate('comment')).toBe(true);
-    expect(roleJson.canDelete('comment')).toBe(true);
-    expect(roleJson.canList('comment')).toBe(true);
+  const updated = role.remove({
+    resource: 'post'
   });
+
+  expect(updated.getResources().length).toBe(1);
+});
+
+describe('Convert the role to object and back to role', () => {
+  const role = new Role({
+    name: 'role',
+    config: {
+      user: {
+        scopes: 'crudl',
+        custom: {
+          ban: false
+        }
+      },
+      post: {
+        scopes: '-rudl',
+        custom: {
+          publish: true
+        }
+      }
+    }
+  });
+
+  const object = role.toObject();
+
+  expect(role.getResources().length).toEqual(object.resources.length);
+  expect(role.config).toEqual(object.config);
+
+  const fromObject = Role.fromObject(object);
+  expect(fromObject.can('post', 'read')).toBe(true);
+});
+
+describe('Convert the role to string and back to role', () => {
+  const role = new Role({
+    name: 'role',
+    config: {
+      user: {
+        scopes: 'crudl',
+        custom: {
+          ban: false
+        }
+      },
+      post: {
+        scopes: '-rudl',
+        custom: {
+          publish: true
+        }
+      }
+    }
+  });
+
+  const string = role.toJSON();
+
+  const fromObject = Role.fromJSON<typeof role>(string);
+  expect(fromObject.can('post', 'read')).toBe(true);
+});
+
+describe('Create an auth manager and manage authorization', () => {
+  const roles = {
+    user: new Role({
+      name: 'user',
+      config: {
+        user: {
+          scopes: '-r--l',
+          custom: {
+            ban: false
+          }
+        },
+        post: {
+          scopes: 'crudl',
+          custom: {
+            publish: true
+          }
+        }
+      }
+    }),
+    admin: new Role({
+      name: 'user',
+      config: {
+        user: {
+          scopes: 'crudl',
+          custom: {
+            ban: true
+          }
+        },
+        post: {
+          scopes: 'crudl',
+          custom: {
+            publish: true
+          }
+        }
+      }
+    })
+  };
+
+  const schema = new Schema(roles);
+  const auth = new AuthManager(schema);
+
+  const isAdminAuthorized = auth.authorize({
+    role: 'admin',
+    actions: ['ban', 'create'],
+    resources: 'user'
+  });
+
+  const isUserAuthorized = auth.authorize({
+    role: 'user',
+    actions: ['read', 'create'],
+    resources: ['post', 'user'],
+    strict: true
+  });
+
+  expect(isAdminAuthorized).toBe(true);
+  expect(isUserAuthorized).toBe(false);
 });

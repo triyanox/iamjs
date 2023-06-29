@@ -1,31 +1,35 @@
-import {
-  ErrorCodes,
-  IAuthManager,
-  IAuthManagerOptions,
-  IAutorizeOptions,
-  IPermission,
-  IRole,
-  extendOpts,
-  permission,
-  permissions,
-  scopes,
-  PermissionsObject
-} from '../types';
-import AuthError from './AuthError';
-import Role from './Role';
-import AuthManager from './AuthManager';
+import Role from './role';
+import AuthManager from './auth';
+import Schema from './schema';
+import AuthError from './error';
 
-export { AuthError, AuthManager, Role };
+export { Role, AuthManager, Schema, AuthError };
 export type {
-  ErrorCodes,
+  AllKeys,
+  AuthorizeConstructOptions,
+  AuthorizeRoleOptions,
+  DefaultScope,
   IAuthManager,
-  IAuthManagerOptions,
-  IAutorizeOptions,
   IPermission,
   IRole,
-  extendOpts,
+  ISchema,
+  InferPermissions,
+  InferResources,
+  MergePermissions,
+  RoleAddResult,
+  RoleRemoveResult,
+  RoleUpdateResult,
+  Roles,
+  TAuthPermissions,
+  TAuthResources,
+  TAutorizeOptions,
+  TRoleOptions,
+  ToJSONResult,
+  ToObjectResult,
+  addOptions,
   permission,
   permissions,
+  removeOptions,
   scopes,
-  PermissionsObject
-};
+  updateOptions
+} from '../types';
