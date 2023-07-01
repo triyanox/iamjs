@@ -1,90 +1,77 @@
-import { AuthError, AuthManager } from '@iamjs/core';
+import { AuthError, AuthManager, Roles, Schema, TAutorizeOptions } from '@iamjs/core';
 import { NextApiRequest, NextApiResponse } from 'next';
 import {
   ActivityCallbackOptions,
-  INextAutorizeOptions,
   INextRoleManager,
-  INextRoleManagerOptions
+  INextRoleManagerOptions,
+  TNextCheckOptions
 } from '../types';
 
 /**
- * The class that is used to manage roles and permissions for `Next.js`
+ * The class that is used to manage roles and permissions from `Next.js`
  * @extends AuthManager
  */
-class NextRoleManager extends AuthManager implements INextRoleManager {
-  onError?: <T extends NextApiRequest, U extends NextApiResponse = NextApiResponse>(
-    err: AuthError,
-    req: T,
-    res: U
-  ) => Promise<void> | void;
-  onSucess?: <T extends NextApiRequest, U extends NextApiResponse = NextApiResponse>(
-    req: T,
-    res: U
-  ) => Promise<void> | void;
-  onActivity?: <T extends NextApiRequest>(options: ActivityCallbackOptions<T>) => Promise<void>;
+class NextRoleManager<T extends Roles<T>> extends AuthManager<T> implements INextRoleManager<T> {
+  public schema: Schema<T>;
 
-  constructor(options: INextRoleManagerOptions) {
-    super(options);
+  onError?: <R extends NextApiRequest, U extends NextApiResponse = NextApiResponse>(
+    err: AuthError,
+    req: R,
+    res: U
+  ) => void;
+  onSucess?: <R extends NextApiRequest, U extends NextApiResponse = NextApiResponse>(
+    req: R,
+    res: U
+  ) => void;
+  onActivity?: <R extends NextApiRequest>(options: ActivityCallbackOptions<T, R>) => Promise<void>;
+
+  constructor(options: INextRoleManagerOptions<T>) {
+    super(options.schema);
+    this.schema = options.schema;
     this.onError = options.onError;
     this.onSucess = options.onSucess;
     this.onActivity = options.onActivity;
   }
 
-  private _getRoleFromRequest(req: NextApiRequest, roleKey: string): string {
-    const role = req[roleKey as keyof NextApiRequest];
-    if (!role) {
-      throw AuthError.throw_error('INVALID_ROLE');
+  private _role(options: TNextCheckOptions<T>): keyof T | 'constrcuted' {
+    if ('role' in options) {
+      return options.role as keyof T;
     }
-    return role;
+    return 'constrcuted';
   }
 
-  private _getPermissionsFromRequest(req: NextApiRequest, permissionsKey: string): any {
-    const permissions = req[permissionsKey as keyof NextApiRequest];
-    if (!permissions) {
-      throw AuthError.throw_error('INVALID_PERMISSIONS');
+  private async _resolveOptions(
+    req: NextApiRequest,
+    options: TNextCheckOptions<T>
+  ): Promise<TAutorizeOptions<T>> {
+    if ('data' in options) {
+      const data = await options.data(req);
+      const o = options as TAutorizeOptions<T> & { data?: string | object };
+      o.data = data;
+      return o;
     }
-    return permissions;
+    return options as TAutorizeOptions<T>;
   }
 
-  public authorize<T extends NextApiRequest, U extends NextApiResponse = NextApiResponse>(
-    options: INextAutorizeOptions,
-    handler: (req: T, res: U) => Promise<void> | void
-  ): (req: T, res: U) => Promise<void> | void {
-    return (req: T, res: U) => {
+  public check<R extends NextApiRequest, U extends NextApiResponse>(
+    handler: (req: R, res: U) => void,
+    options: TNextCheckOptions<T>
+  ): (req: R, res: U) => void {
+    return async (req: R, res: U) => {
+      const o = await this._resolveOptions(req, options);
+      const authorized = this.authorize(o);
       try {
-        let authorized = false;
-        if (!options.usePermissionKey) {
-          const role = this._getRoleFromRequest(req, options.roleKey || 'role');
-          authorized = this.authorizeRole({
-            role,
-            action: options.action,
-            resource: options.resource,
-            loose: options.loose
-          });
-        } else {
-          const permissions = this._getPermissionsFromRequest(
-            req,
-            options.permissionsKey || 'permissions'
-          );
-          authorized = this.authorizeRole({
-            permissions,
-            action: options.action,
-            resource: options.resource,
-            loose: options.loose,
-            constructRole: true
-          });
-        }
         if (authorized) {
           if (this.onActivity) {
-            this.onActivity<T>({
-              action: options.action,
-              resource: options.resource,
-              role: this._getRoleFromRequest(req, options.roleKey || 'role'),
-              success: true,
-              req
+            this.onActivity<R>({
+              actions: options.actions,
+              req,
+              resources: options.resources,
+              role: this._role(options),
+              success: true
             }).then(() => {
               if (this.onSucess) {
-                this.onSucess<T, U>(req, res);
+                this.onSucess<R, U>(req, res);
               } else {
                 handler(req, res);
               }
@@ -92,34 +79,34 @@ class NextRoleManager extends AuthManager implements INextRoleManager {
             return;
           }
           if (this.onSucess) {
-            this.onSucess<T, U>(req, res);
+            this.onSucess<R, U>(req, res);
           } else {
             handler(req, res);
           }
         } else {
           throw AuthError.throw_error('UNAUTHORIZED');
         }
-      } catch (err: any) {
+      } catch (error: any) {
         if (this.onActivity) {
-          this.onActivity<T>({
-            action: options.action,
-            resource: options.resource,
-            role: this._getRoleFromRequest(req, options.roleKey || 'role'),
-            success: false,
-            req
+          this.onActivity<R>({
+            actions: options.actions,
+            req,
+            resources: options.resources,
+            role: this._role(options),
+            success: false
           }).then(() => {
             if (this.onError) {
-              this.onError<T, U>(err, req, res);
+              this.onError<R, U>(error, req, res);
             } else {
-              throw err;
+              throw error;
             }
           });
           return;
         }
         if (this.onError) {
-          this.onError<T, U>(err, req, res);
+          this.onError<R, U>(error, req, res);
         } else {
-          throw err;
+          throw error;
         }
       }
     };
@@ -127,9 +114,4 @@ class NextRoleManager extends AuthManager implements INextRoleManager {
 }
 
 export { NextRoleManager };
-export type {
-  INextAutorizeOptions,
-  INextRoleManager,
-  INextRoleManagerOptions,
-  ActivityCallbackOptions
-};
+export type { ActivityCallbackOptions, INextRoleManager, INextRoleManagerOptions };

@@ -1,56 +1,22 @@
+import { AuthError, IAuthManager, Roles, Schema, TAutorizeOptions } from '@iamjs/core';
 import { Context, Next } from 'koa';
-import { AuthError, IAuthManager, IRole, permission } from '@iamjs/core';
-
-/**
- * The interface for the `authorize` method
- */
-interface IKoaAutorizeOptions {
-  /**
-   * The key that is used to get the role from the request object
-   * @default 'role'
-   */
-  roleKey?: string;
-  /**
-   * The action or actions that are authorized to be executed on the resource
-   */
-  action?: permission | permission[];
-  /**
-   * The resource or resources that are authorized to be accessed
-   */
-  resource: string | string[];
-  /**
-   * If the permissions are used from the request object
-   * @default false
-   */
-  usePermissionKey?: boolean;
-  /**
-   * The key that is used to get the permissions from the request object
-   * @default 'permissions'
-   */
-  permissionsKey?: string;
-  /**
-   * If the permissions should be checked in a loose way
-   * @default false
-   */
-  loose?: boolean;
-}
 
 /**
  * The options for the `onActivity` method
  */
-type ActivityCallbackOptions<T extends Context> = {
+type ActivityCallbackOptions<T extends Roles<T>, C extends Context = Context> = {
   /**
    * The action or actions that are authorized to be executed on the resource
    */
-  action?: permission | permission[];
+  actions?: TAutorizeOptions<T>['actions'];
   /**
    * The resource or resources that are authorized to be accessed
    */
-  resource?: string | string[];
+  resources?: TAutorizeOptions<T>['resources'];
   /**
    * The role that is used to authorize the request
    */
-  role?: string;
+  role?: keyof T | 'constrcuted';
   /**
    * The permissions that are used to authorize the request
    */
@@ -58,64 +24,67 @@ type ActivityCallbackOptions<T extends Context> = {
   /**
    * The context object
    */
-  ctx?: T;
+  ctx?: C;
 };
+
+type TKoaCheckOptions<T extends Roles<T>> = Omit<TAutorizeOptions<T>, 'data'> &
+  (
+    | {
+        data: (ctx: Context) => Promise<string | object>;
+        construct: boolean;
+      }
+    | {
+        role: keyof T;
+      }
+  );
 
 /**
  * The interface for the `KoaRoleManager` class
  * @extends IAuthManager
  */
-interface IKoaRoleManager extends IAuthManager {
+interface IKoaRoleManager<T extends Roles<T>> extends IAuthManager<T> {
+  /**
+   * `AuthManager` schema
+   */
+  schema: Schema<T>;
   /**
    * The method that is used to authorize a request
    */
-  authorize: <T extends Context>(
-    options: IKoaAutorizeOptions
-  ) => (ctx: T, next: Next) => Promise<void> | void;
+  check: <C extends Context>(options: TKoaCheckOptions<T>) => (ctx: C, next: Next) => Promise<void>;
   /**
    * The method that is called when an error occurs
    */
-  onError?: <T extends Context>(err: AuthError, ctx: T, next: Next) => Promise<void> | void;
+  onError?: <C extends Context>(err: AuthError, ctx: C, next: Next) => void;
   /**
    * The method that is called when the authorization is successful
    */
-  onSucess?: <T extends Context>(ctx: T, next: Next) => Promise<void> | void;
+  onSuccess?: <C extends Context>(ctx: C, next: Next) => void;
   /**
    * The method that is called when an activity is performed
    */
-  onActivity?: <T extends Context>(options: ActivityCallbackOptions<T>) => Promise<void>;
+  onActivity?: <C extends Context>(options: ActivityCallbackOptions<T, C>) => Promise<void>;
 }
 
 /**
  * The options for the `KoaRoleManager` class
  */
-interface IKoaRoleManagerOptions {
+interface IKoaRoleManagerOptions<T extends Roles<T>> {
   /**
-   * The roles that are used for authorization
+   * The schema that is used to authorize the request
    */
-  roles: { [key: string]: IRole };
-  /**
-   * The resources that are available to the `ExpressRoleManager` instance
-   * @default []
-   */
-  resources: string[];
+  schema: Schema<T>;
   /**
    * The method that is called when an error occurs
    */
-  onError?: <T extends Context>(err: AuthError, ctx: T, next: Next) => Promise<void> | void;
+  onError?: <C extends Context>(err: AuthError, ctx: C, next: Next) => void;
   /**
    * The method that is called when the authorization is successful
    */
-  onSucess?: <T extends Context>(ctx: T, next: Next) => Promise<void> | void;
+  onSuccess?: <C extends Context>(ctx: C, next: Next) => void;
   /**
    * The method that is called when an activity is performed
    */
-  onActivity?: <T extends Context>(options: ActivityCallbackOptions<T>) => Promise<void>;
+  onActivity?: <C extends Context>(options: ActivityCallbackOptions<T, C>) => Promise<void>;
 }
 
-export type {
-  IKoaAutorizeOptions,
-  IKoaRoleManager,
-  IKoaRoleManagerOptions,
-  ActivityCallbackOptions
-};
+export type { ActivityCallbackOptions, IKoaRoleManager, IKoaRoleManagerOptions, TKoaCheckOptions };

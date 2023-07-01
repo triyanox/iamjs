@@ -1,55 +1,50 @@
-import Koa, { Context, Next } from 'koa';
+import { Role, Schema } from '@iamjs/core';
+import { KoaRoleManager } from '@iamjs/koa';
+import Koa from 'koa';
 import Router from 'koa-router';
 import request from 'supertest';
-import { Role } from '@iamjs/core';
-import { KoaRoleManager } from '@iamjs/koa';
 
-const role = new Role([
-  {
-    resource: 'resource1',
-    scopes: 'crudl'
-  },
-  {
-    resource: 'resource2',
-    scopes: 'cr-dl'
-  }
-]);
+const app = new Koa();
+const router = new Router();
 
-const roleManager = new KoaRoleManager({
-  roles: {
-    role1: role
-  },
-  resources: ['resource1', 'resource2'],
-  onError(_err, ctx, next): Promise<void> {
-    ctx.status = 403;
-    ctx.body = 'Forbidden';
-    return next();
+const role = new Role({
+  name: 'role',
+  config: {
+    resource1: {
+      scopes: 'crudl'
+    },
+    resource2: {
+      scopes: 'cr-dl'
+    }
   }
 });
 
-const app = new Koa();
+const schema = new Schema({
+  role
+});
 
-const router = new Router();
-
-type IAuthCtx = Context & {
-  role: string;
-};
-
-const authWrapper = <T extends Context>(handler: (ctx: T, next: Next) => Promise<void> | void) => {
-  return (ctx: T, next: Next) => {
-    (ctx as unknown as IAuthCtx).role = 'role1';
-    handler(ctx, next);
-  };
-};
+const roleManager = new KoaRoleManager({
+  schema,
+  async onError(_err, ctx, next) {
+    ctx.status = 403;
+    ctx.body = 'Forbidden';
+    await next();
+  },
+  async onSuccess(ctx, next) {
+    ctx.status = 200;
+    ctx.body = 'Hello World from the success handler!';
+    await next();
+  }
+});
 
 router.get(
   '/resource1',
-  authWrapper(
-    roleManager.authorize<IAuthCtx>({
-      resource: 'resource1',
-      action: ['create', 'update']
-    })
-  ),
+  roleManager.check({
+    resources: 'resource1',
+    actions: ['create', 'update'],
+    role: 'role',
+    strict: true
+  }),
   (ctx) => {
     ctx.body = 'Hello World!';
   }
@@ -57,13 +52,36 @@ router.get(
 
 router.get(
   '/resource2',
-  (ctx, next) => {
-    (ctx as unknown as IAuthCtx).role = 'role1';
-    next();
-  },
-  roleManager.authorize({
-    resource: 'resource2',
-    action: ['create', 'update']
+  roleManager.check({
+    resources: 'resource2',
+    actions: ['create', 'update'],
+    role: 'role',
+    strict: true
+  }),
+  (ctx) => {
+    ctx.body = 'Hello World!';
+  }
+);
+
+router.get(
+  '/loose',
+  roleManager.check({
+    resources: 'resource2',
+    actions: ['create', 'update'],
+    role: 'role'
+  }),
+  (ctx) => {
+    ctx.body = 'Hello World!';
+  }
+);
+
+router.get(
+  '/multiple',
+  roleManager.check({
+    resources: ['resource1', 'resource2'],
+    actions: ['create', 'update'],
+    strict: true,
+    role: 'role'
   }),
   (ctx) => {
     ctx.body = 'Hello World!';
@@ -72,15 +90,13 @@ router.get(
 
 router.get(
   '/from-permissions',
-  (ctx, next) => {
-    (ctx as unknown as IAuthCtx).role = 'role1';
-    (ctx as unknown as IAuthCtx).permissions = role.toObject();
-    next();
-  },
-  roleManager.authorize({
-    resource: 'resource1',
-    action: ['create', 'list'],
-    usePermissionKey: true
+  roleManager.check({
+    resources: 'resource1',
+    actions: ['create', 'update'],
+    construct: true,
+    data: async () => {
+      return role.toObject();
+    }
   }),
   (ctx) => {
     ctx.body = 'Hello World!';
