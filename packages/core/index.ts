@@ -26,5 +26,9 @@ export type {
   permissions,
   removeOptions,
   scopes,
-  updateOptions
+  updateOptions,
+  AuthErrorCodes,
+  IntersectionToUnion,
+  Resources,
+  Actions
 } from './lib';

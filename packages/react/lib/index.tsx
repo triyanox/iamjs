@@ -1,155 +1,115 @@
-import { Role, permission, permissions } from '@iamjs/core';
-import React from 'react';
-import { PermissionContextType, PermissionProviderProps, usePermType } from '../types';
-
-const PermissionContext = React.createContext<PermissionContextType>({
-  permissions: {},
-  setPerm: () => { },
-  getPerm: () => false,
-  setInitialPerm: () => Promise.resolve(),
-  generate: () => ({}),
-  show: () => false,
-  isReady: false
-});
+import { AuthManager, Role, Roles, Schema, TRoleOptions } from '@iamjs/core';
+import { Fragment } from 'react';
+import {
+  Actions,
+  Resources,
+  TBuildShowProps,
+  TShowProps,
+  useAuthorizationReturnType
+} from '../types';
 
 /**
- * A React context provider that provides the current set of permissions and functions to set and get permissions.
+ * Create schema from roles object
+ * @param roles - Roles object
+ * @returns Schema object
  */
-const PermissionProvider: React.FC<PermissionProviderProps> = ({
-  children
-}: PermissionProviderProps) => {
-  const [isReady, setIsReady] = React.useState<boolean>(false);
-  const [permissions, setPermissions] = React.useState<Record<string, Record<permission, boolean>>>(
-    {}
-  );
-
-  const setInitialPerm = (role: Role | string): Promise<void> => {
-    return new Promise((resolve) => {
-      if (typeof role === 'string') {
-        setPermissions(Role.fromJSON(role).toObject() as Record<string, Record<permission, boolean>>);
-      }
-      if (typeof role === 'object') {
-        setPermissions(role.toObject() as Record<string, Record<permission, boolean>>);
-      }
-      setIsReady(true);
-      resolve();
-    });
-
-  };
-
-  const setPerm = (resource: string, permission: permissions, grant: boolean) => {
-    if (!isReady) return
-    const newPermissions = { ...permissions };
-    if (!newPermissions[resource]) {
-      newPermissions[resource] = {} as Record<permission, boolean>;
-    }
-    if (Array.isArray(permission)) {
-      permission.forEach((p) => {
-        newPermissions[resource][p] = grant;
-      });
-    } else {
-      newPermissions[resource][permission] = grant;
-    }
-    setPermissions(newPermissions);
-  };
-
-  const getPerm = (resource: string, permission?: permissions) => {
-    if (!isReady) return false;
-    const [r, ...actions] = resource.split(':');
-    const grantedActions = permissions?.[r];
-
-    if (!grantedActions) {
-      return false;
-    }
-
-    if (actions.length) {
-      const actionList = actions[0].split(',');
-      return actionList.reduce((acc, curr) => {
-        acc = (acc && grantedActions[curr as permission]) ?? false;
-        return acc;
-      }, true);
-    }
-
-    if (Array.isArray(permission)) {
-      return permission.reduce((acc, curr) => {
-        acc[curr] = grantedActions[curr] ?? false;
-        return acc;
-      }, {} as Record<permission, boolean>);
-    }
-
-    return grantedActions[permission ?? ('' as permission)] ?? false;
-  };
-
-  const generate = (type: 'json' | 'object') => {
-    if (!isReady) return type === 'json' ? '{}' : {};
-    if (type === 'json') {
-      return JSON.stringify(permissions);
-    }
-
-    return permissions;
-  };
-
-  const show = (resource: string, permission?: permissions): boolean => {
-    if (!isReady) return false;
-    const [r, ...actions] = resource.split(':');
-    const grantedActions = permissions?.[r];
-
-    if (!grantedActions) {
-      return false;
-    }
-
-    if (actions.length) {
-      const actionList = actions[0].split(',');
-      return actionList.reduce((acc, curr) => {
-        acc = (acc && grantedActions[curr as permission]) ?? false;
-        return acc;
-      }, true);
-    }
-
-    if (Array.isArray(permission)) {
-      return permission.reduce((acc, curr) => {
-        acc = (acc && grantedActions[curr]) ?? false;
-        return acc;
-      }, true);
-    }
-
-    return grantedActions[permission ?? ('' as permission)] ?? false;
-  };
-
-  return (
-    <PermissionContext.Provider
-      value={{ permissions, generate, setPerm, getPerm, setInitialPerm, show, isReady }}
-    >
-      {children}
-    </PermissionContext.Provider>
-  );
+const createSchema = <
+  T extends {
+    [K in keyof T]: T[K] extends Role<infer U> ? Role<U> : never;
+  }
+>(
+  roles: T
+): Schema<T> => {
+  const schema = new Schema<T>(roles);
+  return schema;
 };
 
 /**
- * A custom hook that provides access to the permission context values.
- * @param {IRole} role - An optional role object to set initial permissions.
- * @returns {{permissions: Record<string, Record<permission, boolean>>, setPerm: Function, getPerm: Function, load: Function, generate: Function}} An object containing permission related functions and values.
+ * `@imajs` React hook for authorization
+ * @param schema - Schema object
+ * @returns Authorization object
  */
-const usePerm = (role?: Role | string): usePermType => {
-  const { permissions, setPerm, getPerm, setInitialPerm, generate, show, isReady } =
-    React.useContext(PermissionContext);
-  React.useEffect(() => {
-    if (role) {
-      setInitialPerm(role);
+const useAuthorization = <T extends Roles<T>>(schema: Schema<T>): useAuthorizationReturnType<T> => {
+  const authManager = new AuthManager(schema);
+
+  function can(role: keyof T, resources: Resources<T>, actions: Actions<T>, strict = false) {
+    return authManager.authorize({
+      role,
+      resources,
+      actions,
+      strict
+    });
+  }
+  function build<U extends TRoleOptions>(init: U | string) {
+    let role: Role<U> = {} as Role<U>;
+    if (typeof init === 'string') {
+      role = Role.fromJSON<U>(init) as unknown as Role<U>;
     }
-  }, [role]);
+    if (typeof init === 'object') {
+      role = Role.fromObject(init) as unknown as Role<U>;
+    }
+
+    function can(resources: Resources<T>, actions: Actions<T>, strict = false) {
+      return authManager.authorize({
+        data: role.toObject(),
+        construct: true,
+        resources,
+        actions,
+        strict
+      });
+    }
+    const Show = ({
+      children,
+      resources,
+      actions,
+      strict = false
+    }: TBuildShowProps<T>): JSX.Element | null => {
+      const can = authManager.authorize({
+        data: role.toObject(),
+        construct: true,
+        resources,
+        actions,
+        strict
+      });
+      if (can) {
+        return <Fragment>{children}</Fragment>;
+      }
+      return null;
+    };
+
+    return {
+      can,
+      Show,
+      role
+    };
+  }
+
+  const Show = ({
+    children,
+    role,
+    resources,
+    actions,
+    strict = false
+  }: TShowProps<T>): JSX.Element | null => {
+    const can = authManager.authorize({
+      role,
+      resources,
+      actions,
+      strict
+    });
+    if (can) {
+      return <Fragment>{children}</Fragment>;
+    }
+    return null;
+  };
 
   return {
-    isReady,
-    permissions,
-    setPerm,
-    getPerm,
-    load: setInitialPerm,
-    generate,
-    show
+    authorize: authManager.authorize,
+    use: schema.getRole,
+    can,
+    Show,
+    build
   };
 };
 
-export { PermissionProvider, usePerm };
-export type { PermissionContextType, PermissionProviderProps, usePermType };
-
+export { createSchema, useAuthorization };

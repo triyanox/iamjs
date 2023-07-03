@@ -1,6 +1,6 @@
 {
   "extends": "../../tsconfig.json",
-  "include": ["**/*.ts", "**/*.tsx"],
+  "include": ["**/*.ts", "**/*.tsx", "../react/types/construct.ts"],
   "exclude": ["node_modules", "**/__tests__/*"],
   "compilerOptions": {
     "paths": {

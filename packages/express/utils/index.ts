@@ -10,7 +10,11 @@ const role = new Role({
       scopes: 'crudl'
     },
     resource2: {
-      scopes: 'cr-dl'
+      scopes: 'cr-dl',
+      custom: {
+        'hfkas fjahfjas': true,
+        'create a new user': false
+      }
     }
   }
 });

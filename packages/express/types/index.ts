@@ -52,7 +52,7 @@ interface IExpressRoleManager<T extends Roles<T>> extends IAuthManager<T> {
    * ***********************************************************************************************
    * You can declaration merging to add the `role` or `data` keys to the `Request` interface
    * @see https://www.typescriptlang.org/docs/handbook/declaration-merging.html
-∏   */
+   */
   check: <R extends Request, U extends Response>(
     options: TExpressCheckOptions<T>
   ) => (req: R, res: U, next: NextFunction) => void;

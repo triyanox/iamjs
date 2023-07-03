@@ -314,6 +314,18 @@ type MergePermissions<
   }[keyof T];
 };
 
+type Resources<T extends Roles<T>> =
+  | Array<keyof MergePermissions<T>>
+  | keyof MergePermissions<T>
+  | (string & {})
+  | (string & {})[];
+
+type Actions<T extends Roles<T>> =
+  | Array<keyof IntersectionToUnion<MergePermissions<T>[keyof MergePermissions<T>]>>
+  | keyof IntersectionToUnion<MergePermissions<T>[keyof MergePermissions<T>]>
+  | (string & {})
+  | (string & {})[];
+
 interface ISchema<T extends Roles<T>> {
   roles: {
     [K in keyof T]: T[K] extends Role<infer U> ? Role<U> : never;
@@ -348,13 +360,12 @@ type AuthorizeRoleOptions<T extends Roles<T>> = {
   /**
    * The resources to authorize
    */
-  resources: Array<keyof MergePermissions<T>> | keyof MergePermissions<T>;
+  resources: Resources<T>;
   /**
    * The actions to authorize
    */
-  actions:
-    | Array<keyof IntersectionToUnion<MergePermissions<T>[keyof MergePermissions<T>]>>
-    | keyof IntersectionToUnion<MergePermissions<T>[keyof MergePermissions<T>]>;
+  actions: Actions<T>;
+
   /**
    * The strict mode
    */
@@ -365,13 +376,12 @@ type AuthorizeConstructOptions<T extends Roles<T>> = {
   /**
    * The resources to authorize
    */
-  resources: Array<keyof MergePermissions<T>> | keyof MergePermissions<T>;
+  resources: Resources<T>;
   /**
    * The actions to authorize
    */
-  actions:
-    | Array<keyof IntersectionToUnion<MergePermissions<T>[keyof MergePermissions<T>]>>
-    | keyof IntersectionToUnion<MergePermissions<T>[keyof MergePermissions<T>]>;
+  actions: Actions<T>;
+
   /**
    * The strict mode
    */
@@ -416,6 +426,7 @@ export type {
   ISchema,
   InferPermissions,
   InferResources,
+  IntersectionToUnion,
   MergePermissions,
   RoleAddResult,
   RoleRemoveResult,
@@ -433,5 +444,6 @@ export type {
   removeOptions,
   scopes,
   updateOptions,
-  IntersectionToUnion
+  Resources,
+  Actions
 };

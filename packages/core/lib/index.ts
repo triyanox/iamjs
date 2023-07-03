@@ -31,5 +31,9 @@ export type {
   permissions,
   removeOptions,
   scopes,
-  updateOptions
+  updateOptions,
+  IntersectionToUnion,
+  AuthErrorCodes,
+  Resources,
+  Actions
 } from '../types';

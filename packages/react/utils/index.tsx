@@ -1,66 +1,58 @@
 import { Role } from '@iamjs/core';
-import { usePerm } from '@iamjs/react';
+import { createSchema, useAuthorization } from '@iamjs/react';
 
-const role = new Role([
-  {
-    resource: 'books',
-    scopes: '----l'
-  }
-]);
+const schema = createSchema({
+  user: new Role({
+    name: 'user',
+    description: 'User role',
+    meta: {
+      name: 'user'
+    },
+    config: {
+      books: {
+        scopes: 'crudl',
+        custom: {
+          upgrade: true,
+          downgrade: false,
+          sort: true
+        }
+      }
+    }
+  })
+});
 
-const PermissionProviderTestComponent = () => {
-  const { setPerm, getPerm } = usePerm(role);
-
-  const handleSetPerm = () => {
-    setPerm('books', 'create', true);
-  };
+const CanComponent = () => {
+  const { can } = useAuthorization(schema);
 
   return (
-    <>
-      <div data-testid="books-create-permission">{getPerm('books', 'create').toString()}</div>
-      <button onClick={handleSetPerm} data-testid="set-perm-button">
-        Set Permission
-      </button>
-    </>
+    <div data-testid="books-create-permission">{can('user', 'books', 'create').toString()}</div>
   );
 };
 
-const FromJSONStringTestComponent = () => {
-  const { setPerm, getPerm } = usePerm(role.toJSON());
-
-  const handleSetPerm = () => {
-    setPerm('books', 'create', true);
-  };
+const TestShowComponent = () => {
+  const { Show } = useAuthorization(schema);
 
   return (
-    <>
-      <div data-testid="books-create-permission">{getPerm('books', 'create').toString()}</div>
-      <button onClick={handleSetPerm} data-testid="set-perm-button">
-        Set Permission
-      </button>
-    </>
+    <Show role="user" resources="books" actions="create">
+      <div data-testid="books-create-permission">true</div>
+    </Show>
   );
 };
 
-const PermissionsStingTestComponent = () => {
-  const { setPerm, getPerm } = usePerm(role);
-
-  const handleSetPerm = () => {
-    setPerm('books', 'create', true);
-  };
-
-  return (
-    <>
-      <div data-testid="books-read-permission">{getPerm('books:list,create').toString()}</div>
-      <button onClick={handleSetPerm} data-testid="set-perm-button">
-        Set Permission
-      </button>
-    </>
+const TestBuildRole = () => {
+  const { build } = useAuthorization(schema);
+  const { can } = build(
+    schema
+      .getRole('user')
+      .update({
+        resource: 'books',
+        permissions: {
+          scopes: '-----'
+        }
+      })
+      .toObject()
   );
+  return <div data-testid="books-create-permission">{can('books', 'create').toString()}</div>;
 };
 
-export {
-  PermissionProviderTestComponent,
-  PermissionsStingTestComponent,
-  FromJSONStringTestComponent
-};
+export { CanComponent, TestBuildRole, TestShowComponent };
