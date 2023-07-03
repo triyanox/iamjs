@@ -1,13 +1,4 @@
-import {
-  Actions,
-  IntersectionToUnion,
-  MergePermissions,
-  Resources,
-  Role,
-  Roles,
-  TAutorizeOptions,
-  TRoleOptions
-} from '@iamjs/core';
+import { Actions, Resources, Role, Roles, TAutorizeOptions, TRoleOptions } from '@iamjs/core';
 
 type TShowProps<T extends Roles<T>> = {
   role: keyof T;
@@ -33,14 +24,7 @@ type useAuthorizationReturnType<T extends Roles<T>> = {
    * @param strict - Strict mode (default: false)
    * @returns boolean
    */
-  can: (
-    role: keyof T,
-    resources: Resources<T>,
-    actions:
-      | Array<keyof IntersectionToUnion<MergePermissions<T>[keyof MergePermissions<T>]>>
-      | keyof IntersectionToUnion<MergePermissions<T>[keyof MergePermissions<T>]>,
-    strict?: boolean
-  ) => boolean;
+  can: (role: keyof T, resources: Resources<T>, actions: Actions<T>, strict?: boolean) => boolean;
   /**
    * This method is used to check the permissions of a role on a resource
    */
