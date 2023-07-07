@@ -1,263 +1,276 @@
 import {
+  DefaultScope,
   IPermission,
   IRole,
-  PermissionsObject,
-  extendOpts,
-  permission,
-  permissions,
-  scopes
+  InferPermissions,
+  InferResources,
+  RoleAddResult,
+  RoleRemoveResult,
+  RoleUpdateResult,
+  TRoleOptions,
+  ToObjectResult,
+  addOptions,
+  removeOptions,
+  updateOptions
 } from '../types';
+import utils from '../utils';
 
 /**
- * Role class
+ * `Role` class
  */
-export default class Role implements IRole {
-  public permissions: IPermission[] = [];
+class Role<T extends TRoleOptions> implements IRole<T> {
+  name: T['name'];
+  description?: string;
+  meta?: Record<string, any> = {};
+  config: T['config'];
+  resources: InferResources<T['config']>[];
+  permissions: InferPermissions<T['config']>;
 
-  /**
-   * Role constructor
-   */
-  constructor(permissions: IPermission[] = []) {
-    this.permissions = permissions;
+  constructor(options: T) {
+    this.config = options.config;
+    this.name = options.name;
+    this.description = options.description;
+    this.meta = options.meta;
+    this.resources = Object.keys(options.config);
+    this.permissions = this.init(options.config, this.resources as string[]);
   }
 
-  private formatPermission(permission: permission): 'c' | 'r' | 'u' | 'd' | 'l' {
-    switch (permission) {
-      case 'create':
-        return 'c';
-      case 'read':
-        return 'r';
-      case 'update':
-        return 'u';
-      case 'delete':
-        return 'd';
-      case 'list':
-        return 'l';
-      default:
-        return permission;
-    }
+  private getDefaultPermission(p: DefaultScope) {
+    const scopes = {
+      c: 'create',
+      r: 'read',
+      u: 'update',
+      d: 'delete',
+      l: 'list'
+    };
+    return scopes[p];
   }
 
-  public addPermission(permission: IPermission): this {
-    this.permissions.push(permission);
-    return this;
-  }
+  private init<C extends Record<string, IPermission>, R extends InferResources<C>[]>(
+    config: C,
+    resources: R
+  ): InferPermissions<T['config']> {
+    const permissions: InferPermissions<C> = {} as InferPermissions<C>;
 
-  public removePermission(resource: string): this {
-    this.permissions = this.permissions.filter((p) => {
-      return p.resource !== resource;
-    });
-    return this;
-  }
+    for (const resource of resources) {
+      const resourcePermissions = config[resource].scopes;
+      const customPermissions = config[resource].custom;
+      const resourcePermissionsSet = new Set(resourcePermissions);
+      const resourcePermissionsObject: any = {};
 
-  public updatePermission(permission: IPermission): this {
-    this.permissions = this.permissions.map((p) => {
-      if (p.resource === permission.resource) {
-        return permission;
+      for (const p of ['c', 'r', 'u', 'd', 'l']) {
+        resourcePermissionsObject[this.getDefaultPermission(p as DefaultScope)] =
+          resourcePermissionsSet.has(p);
       }
-      return p;
-    });
-    return this;
-  }
 
-  public canCreate(resource: string): boolean {
-    return this.can('create', resource);
-  }
-
-  public canRead(resource: string): boolean {
-    return this.can('read', resource);
-  }
-
-  public canUpdate(resource: string): boolean {
-    return this.can('update', resource);
-  }
-
-  public canDelete(resource: string): boolean {
-    return this.can('delete', resource);
-  }
-
-  public canList(resource: string): boolean {
-    return this.can('list', resource);
-  }
-
-  public can(permission: permission, resource: string): boolean {
-    const formattedPermission = this.formatPermission(permission);
-    const permissionObject = this.permissions.find((p) => {
-      return p.resource === resource;
-    });
-    if (!permissionObject) {
-      return false;
+      permissions[resource] = utils.merge<Record<string, boolean>, any>(
+        resourcePermissionsObject,
+        customPermissions
+      );
     }
-    return permissionObject.scopes.includes(formattedPermission);
+    return permissions;
   }
 
-  public canAny(permissions: permissions, resource: string): boolean {
-    if (Array.isArray(permissions)) {
-      return (permissions as any[]).some((permission) => {
-        return this.can(permission, resource);
-      });
-    }
-
-    return this.can(permissions, resource);
+  public getPermissions() {
+    return this.permissions;
   }
 
-  public canAll(permissions: permissions, resource: string): boolean {
-    if (Array.isArray(permissions)) {
-      return (permissions as any[]).every((permission) => {
-        return this.can(permission, resource);
-      });
-    }
-
-    return this.can(permissions, resource);
+  public getResources(): InferResources<T['config']>[] {
+    return this.resources;
   }
 
-  public extend(role: IRole, options?: extendOpts): this {
-    if (Array.isArray(options)) {
-      options = { permissions: options };
-      role.permissions.forEach((permission) => {
-        this.addPermission(permission);
-      });
-      options?.permissions?.forEach((permission) => {
-        this.addPermission(permission);
-      });
-      return this;
-    }
+  public add<S extends string, P extends IPermission>(options: addOptions<S, P>) {
+    const { permissions, resource, mutate, noOverride } = options;
 
-    if (!options) {
-      role.permissions.forEach((permission) => {
-        this.addPermission(permission);
-      });
-      return this;
-    }
-
-    if (options.overwrite) {
-      this.permissions = role.permissions;
-      if (options.permissions) {
-        options.permissions?.forEach((permission) => {
-          const existingPermission = this.permissions.find(
-            (p) => p.resource === permission.resource
-          );
-          if (existingPermission) {
-            this.updatePermission(permission);
-          } else {
-            this.addPermission(permission);
-          }
-        });
-      }
-      return this;
-    }
-    if (options.permissions) {
-      this.permissions = role.permissions;
-      options.permissions?.forEach((permission) => {
-        const existingPermission = this.permissions.find((p) => p.resource === permission.resource);
-        if (existingPermission) {
-          return;
-        } else {
-          this.addPermission(permission);
+    if (mutate) {
+      this.config = utils.merge(
+        this.config,
+        {
+          [resource]: permissions
+        } as {
+          [K in S]: P;
+        },
+        {
+          preserve: noOverride
         }
-      });
+      );
+      this.permissions = this.init(this.config, this.resources as string[]);
+      return this as unknown as RoleAddResult<T, S, P>;
     }
-    return this;
+
+    return new Role({
+      name: this.name,
+      description: this.description,
+      meta: this.meta,
+      config: utils.merge(
+        this.config,
+        {
+          [resource]: permissions
+        } as {
+          [K in S]: P;
+        },
+        {
+          preserve: noOverride
+        }
+      )
+    });
   }
 
-  public generate(format: 'json' | 'object' = 'json'): string | PermissionsObject {
-    const Object: any = {};
-
-    this.permissions.forEach((permission) => {
-      const resource = permission.resource;
-      const scopes = permission.scopes;
-      Object[resource] = {
-        create: scopes.includes('c'),
-        read: scopes.includes('r'),
-        update: scopes.includes('u'),
-        delete: scopes.includes('d'),
-        list: scopes.includes('l')
-      };
-    });
-    if (format === 'json') {
-      return JSON.stringify(Object);
+  public remove<S extends string>(options: removeOptions<S>) {
+    const { resource, mutate } = options;
+    if (mutate) {
+      delete this.config[resource];
+      delete this.permissions[resource];
+      return this as unknown as RoleRemoveResult<T, S>;
     }
-    return Object;
+    return new Role({
+      name: this.name,
+      description: this.description,
+      meta: this.meta,
+      config: utils.omit(this.config, [resource]) as Omit<T['config'], S>
+    });
+  }
+
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  public update<S extends keyof this['permissions'] & (string & {}), P extends IPermission>(
+    options: updateOptions<S, P>
+  ) {
+    const { permissions, resource, mutate, noOverride } = options;
+    if (mutate) {
+      this.config = utils.merge(
+        this.config,
+        {
+          [resource]: permissions
+        } as {
+          [K in S]: P;
+        },
+        {
+          preserve: noOverride
+        }
+      );
+      this.permissions = this.init(this.config, this.resources as string[]);
+      return this as unknown as RoleUpdateResult<T, S, P>;
+    }
+    return new Role({
+      name: this.name,
+      description: this.description,
+      meta: this.meta,
+      config: utils.merge(
+        this.config,
+        {
+          [resource]: permissions
+        } as {
+          [K in S]: P;
+        },
+        {
+          preserve: noOverride
+        }
+      )
+    });
+  }
+
+  public can<S extends keyof this['permissions'], P extends keyof this['permissions'][S]>(
+    resource: S,
+    permission: P
+  ): boolean {
+    const permissions = new Map(Object.entries(this.getPermissions()));
+    const resourcePermissions = permissions.get(resource as string);
+    if (!resourcePermissions) return false;
+    return resourcePermissions[permission as string];
+  }
+
+  public cannot<S extends keyof this['permissions'], P extends keyof this['permissions'][S]>(
+    resource: S,
+    permission: P
+  ): boolean {
+    return !this.can(resource, permission);
+  }
+
+  public canAny<S extends keyof this['permissions']>(
+    resource: S,
+    permissions: (keyof this['permissions'][S])[]
+  ): boolean {
+    return permissions.some((p) => this.can(resource, p));
+  }
+
+  public canAll<S extends keyof this['permissions']>(
+    resource: S,
+    permissions: (keyof this['permissions'][S])[]
+  ): boolean {
+    return permissions.every((p) => this.can(resource, p));
+  }
+
+  public clone() {
+    return new Role({
+      name: this.name,
+      description: this.description,
+      meta: this.meta,
+      config: this.config
+    }) as unknown as Role<T>;
   }
 
   public toJSON() {
-    return this.generate('json') as string;
+    return utils.seialize({
+      name: this.name,
+      description: this.description,
+      meta: this.meta,
+      config: this.config
+    });
   }
 
-  public toObject() {
-    return this.generate('object') as PermissionsObject;
+  public toObject(): ToObjectResult<T> {
+    return {
+      name: this.name,
+      description: this.description,
+      meta: this.meta,
+      config: this.config,
+      permissions: this.permissions,
+      resources: this.resources
+    };
   }
 
   /**
-   * Load a role from a json string
-   * @param json - Json string to load
+   *  Creates a role from a JSON string
    */
-  public static fromJSON(json: string) {
-    const object = JSON.parse(json);
-    return Role.fromObject(object);
+  public static fromJSON<T extends TRoleOptions>(json: string) {
+    const data = utils.deserialize(json);
+    return this.fromObject<T>(data as T);
   }
 
   /**
-   * Load a role from a javascript object
-   * @param object - Object to load
+   *  Creates a role from object
    */
-  public static fromObject(o: PermissionsObject) {
-    const permissions: IPermission[] = [];
-    Object.keys(o).forEach((resource) => {
-      let scopes = '';
-      Object.keys(o[resource]).forEach((scope) => {
-        if (o[resource][scope as permission]) {
-          scopes += scope[0];
-        } else {
-          scopes += '-';
-        }
-      });
-      permissions.push({
-        resource,
-        scopes: scopes as scopes
-      });
+  public static fromObject<T extends TRoleOptions>(object: T) {
+    const errors = this.validate(object);
+    if (errors.length) {
+      return utils.throwErr(errors);
+    }
+    return new Role({
+      config: object.config as T['config'],
+      description: object.description as T['description'],
+      meta: object.meta as T['meta'],
+      name: object.name as T['name']
     });
-    return new Role(permissions as IPermission[]);
   }
 
-  public static validate(role: IRole, cb?: (result: boolean, error?: Error) => void): boolean {
-    try {
-      const result = role.permissions.every((permission) => {
-        return this.validatePermission(permission);
-      });
-      if (cb) {
-        cb(result);
-      }
-      return result;
-    } catch (e: any) {
-      if (cb) {
-        cb(false, e);
-      }
-      return false;
+  /**
+   * Validates the role object
+   */
+  public static validate(object: any, cb?: (result: boolean, errors: string[]) => void): string[];
+  public static validate(object: any): string[];
+  public static validate(object: any, cb?: (result: boolean, errors: string[]) => void): string[] {
+    const { name, config } = object;
+    const errors: string[] = [];
+    utils.validate.notEmpty(Object.keys(object), 'Role must not be empty', errors);
+    utils.validate.notNull(name, 'Name of the role is required', errors);
+    utils.validate.string(name, 'Name of the role must be a string', errors);
+    utils.validate.notNull(config, 'Config of the role is required', errors);
+    utils.validate.object(config, 'Config of the role must be an object', errors);
+    if (cb) {
+      cb(errors.length === 0, errors);
     }
-  }
-
-  public static validatePermission(permission: IPermission): boolean {
-    if (!permission.resource) {
-      throw new Error('Resource is required');
-    }
-    if (!permission.scopes) {
-      throw new Error('Scopes are required');
-    }
-    if (permission.scopes.length !== 5) {
-      throw new Error('Scopes must be 5 characters long');
-    }
-    if (!permission.scopes.match(/^[crudl-]+$/)) {
-      throw new Error('Scopes must be in the format of crudl');
-    }
-    return true;
-  }
-
-  public getResources(): string[] {
-    const resources = new Set<string>();
-    this.permissions.forEach((permission) => {
-      resources.add(permission.resource);
-    });
-    return Array.from(resources);
+    return errors;
   }
 }
+
+export default Role;

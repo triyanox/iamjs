@@ -1,100 +1,98 @@
-import { AuthError, AuthManager } from '@iamjs/core';
+import { AuthError, AuthManager, Roles, Schema, TAutorizeOptions } from '@iamjs/core';
 import { Context, Next } from 'koa';
 import {
   ActivityCallbackOptions,
-  IKoaAutorizeOptions,
   IKoaRoleManager,
-  IKoaRoleManagerOptions
+  IKoaRoleManagerOptions,
+  TKoaCheckOptions
 } from '../types';
 
-/**
- * The class that is used to manage roles and permissions for `Koa`
- * @extends AuthManager
- */
-class KoaRoleManager extends AuthManager implements IKoaRoleManager {
-  onError?: <T extends Context>(err: AuthError, ctx: T, next: Next) => Promise<void> | void;
-  onSucess?: <T extends Context>(ctx: T, next: Next) => Promise<void> | void;
-  onActivity?: <T extends Context>(options: ActivityCallbackOptions<T>) => Promise<void>;
+class KoaRoleManager<T extends Roles<T>> extends AuthManager<T> implements IKoaRoleManager<T> {
+  public schema: Schema<T>;
 
-  constructor(options: IKoaRoleManagerOptions) {
-    super(options);
+  onError?: (err: AuthError, ctx: Context, next: Next) => void;
+  onSuccess?: (ctx: Context, next: Next) => void;
+  onActivity?: (options: ActivityCallbackOptions<T, Context>) => Promise<void>;
+
+  constructor(options: IKoaRoleManagerOptions<T>) {
+    super(options.schema);
+    this.schema = options.schema;
     this.onError = options.onError;
-    this.onSucess = options.onSucess;
+    this.onSuccess = options.onSuccess;
     this.onActivity = options.onActivity;
   }
 
-  private _getRoleFromRequest(ctx: Context, roleKey: string): string {
-    const role = ctx[roleKey as keyof Context];
-    if (!role) {
-      throw AuthError.throw_error('INVALID_ROLE');
+  private _role(options: TKoaCheckOptions<T>): keyof T | 'constrcuted' {
+    if ('role' in options) {
+      return options.role as keyof T;
     }
-    return role;
+    return 'constrcuted';
   }
 
-  private _getPermissionsFromRequest(ctx: Context, permissionsKey: string): any {
-    const permissions = ctx[permissionsKey as keyof Context];
-    if (!permissions) {
-      throw AuthError.throw_error('INVALID_PERMISSIONS');
+  private async _resolveOptions(
+    ctx: Context,
+    options: TKoaCheckOptions<T>
+  ): Promise<TAutorizeOptions<T>> {
+    if ('data' in options) {
+      const data = await options.data(ctx);
+      const o = options as TAutorizeOptions<T> & { data?: string | object };
+      o.data = data;
+      return o;
     }
-    return permissions;
+    return options as TAutorizeOptions<T>;
   }
 
-  public authorize<T extends Context>(
-    options: IKoaAutorizeOptions
-  ): (ctx: T, next: Next) => Promise<void> | void {
-    return async (ctx: T, next: Next) => {
+  public check(options: TKoaCheckOptions<T>): (ctx: Context, next: Next) => Promise<void> {
+    return async (ctx: Context, next: Next) => {
+      const o = await this._resolveOptions(ctx, options);
+      const authorized = this.authorize(o);
       try {
-        let authorized = false;
-        if (!options.usePermissionKey) {
-          const role = this._getRoleFromRequest(ctx, options.roleKey || 'role');
-          authorized = this.authorizeRole({
-            role,
-            action: options.action,
-            resource: options.resource,
-            loose: options.loose
-          });
+        if (authorized) {
+          if (this.onActivity) {
+            this.onActivity({
+              actions: options.actions,
+              ctx,
+              resources: options.resources,
+              role: this._role(options),
+              success: true
+            }).then(() => {
+              if (this.onSuccess) {
+                this.onSuccess(ctx, next);
+              } else {
+                next();
+              }
+            });
+            return;
+          }
+          if (this.onSuccess) {
+            this.onSuccess(ctx, next);
+          } else {
+            next();
+          }
         } else {
-          const permissions = this._getPermissionsFromRequest(
-            ctx,
-            options.permissionsKey || 'permissions'
-          );
-          authorized = this.authorizeRole({
-            permissions,
-            action: options.action,
-            resource: options.resource,
-            loose: options.loose,
-            constructRole: true
-          });
+          throw AuthError.throw_error('UNAUTHORIZED');
         }
-        if (!authorized) throw AuthError.throw_error('UNAUTHORIZED');
+      } catch (error: any) {
         if (this.onActivity) {
-          await this.onActivity<T>({
+          this.onActivity({
+            actions: options.actions,
             ctx,
-            action: options.action,
-            resource: options.resource,
-            role: this._getRoleFromRequest(ctx, options.roleKey || 'role'),
-            success: true
-          });
-        }
-        if (this.onSucess) {
-          this.onSucess<T>(ctx, next);
-        } else {
-          await next();
-        }
-      } catch (err: any) {
-        if (this.onActivity) {
-          await this.onActivity<T>({
-            ctx,
-            action: options.action,
-            resource: options.resource,
-            role: this._getRoleFromRequest(ctx, options.roleKey || 'role'),
+            resources: options.resources,
+            role: this._role(options),
             success: false
+          }).then(() => {
+            if (this.onError) {
+              this.onError(error, ctx, next);
+            } else {
+              throw error;
+            }
           });
+          return;
         }
         if (this.onError) {
-          this.onError<T>(err, ctx, next);
+          this.onError(error, ctx, next);
         } else {
-          throw err;
+          throw error;
         }
       }
     };
@@ -102,9 +100,4 @@ class KoaRoleManager extends AuthManager implements IKoaRoleManager {
 }
 
 export { KoaRoleManager };
-export type {
-  IKoaAutorizeOptions,
-  IKoaRoleManager,
-  IKoaRoleManagerOptions,
-  ActivityCallbackOptions
-};
+export type { ActivityCallbackOptions, IKoaRoleManager, IKoaRoleManagerOptions };

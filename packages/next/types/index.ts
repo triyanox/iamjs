@@ -1,55 +1,22 @@
-import { AuthError, IAuthManager, IRole, permission } from '@iamjs/core';
+import { AuthError, IAuthManager, Roles, Schema, TAutorizeOptions } from '@iamjs/core';
 import { NextApiRequest, NextApiResponse } from 'next';
-
-/**
- * The interface for the `authorize` method
- */
-interface INextAutorizeOptions {
-  /**
-   * The key that is used to get the role from the request object
-   * @default 'role'
-   */
-  roleKey?: string;
-  /**
-   * The action or actions that are authorized to be executed on the resource
-   */
-  action?: permission | permission[];
-  /**
-   * The resource or resources that are authorized to be accessed
-   */
-  resource: string | string[];
-  /**
-   * If the permissions are used from the request object
-   */
-  usePermissionKey?: boolean;
-  /**
-   * The key that is used to get the permissions from the request object
-   * @default 'permissions'
-   */
-  permissionsKey?: string;
-  /**
-   * If the permissions should be checked in a loose way
-   * @default false
-   */
-  loose?: boolean;
-}
 
 /**
  * The options for the `onActivity` method
  */
-type ActivityCallbackOptions<T extends NextApiRequest> = {
+type ActivityCallbackOptions<T extends Roles<T>, R extends NextApiRequest = NextApiRequest> = {
   /**
    * The action or actions that are authorized to be executed on the resource
    */
-  action?: permission | permission[];
+  actions?: TAutorizeOptions<T>['actions'];
   /**
    * The resource or resources that are authorized to be accessed
    */
-  resource?: string | string[];
+  resources?: TAutorizeOptions<T>['resources'];
   /**
    * The role that is used to authorize the request
    */
-  role?: string;
+  role?: keyof T | 'constrcuted';
   /**
    * The permissions that are used to authorize the request
    */
@@ -57,82 +24,83 @@ type ActivityCallbackOptions<T extends NextApiRequest> = {
   /**
    * The request object
    */
-  req?: T;
+  req?: R;
 };
+
+type TNextCheckOptions<T extends Roles<T>> = Omit<TAutorizeOptions<T>, 'data'> &
+  (
+    | {
+        data: (req: NextApiRequest) => Promise<string | object>;
+        construct: boolean;
+      }
+    | {
+        role: keyof T;
+      }
+  );
 
 /**
  * The interface for the `NextRoleManager` class
  * @extends IAuthManager
  */
-interface INextRoleManager extends IAuthManager {
+interface INextRoleManager<T extends Roles<T>> extends IAuthManager<T> {
+  /**
+   * `AuthManager` schema
+   */
+  schema: Schema<T>;
   /**
    * The method that is used to authorize a request
-   * This method takes some options as first argument and a `NextApiHandler` as second argument
-   * @param options The options for authorization
    */
-  authorize: <T extends NextApiRequest, U extends NextApiResponse>(
-    options: INextAutorizeOptions,
-    handler: (req: T, res: U) => Promise<void> | void
-  ) => (req: T, res: U) => Promise<void> | void;
+  check: <R extends NextApiRequest, U extends NextApiResponse>(
+    handler: (req: R, res: U) => Promise<void> | void,
+    options: TNextCheckOptions<T>
+  ) => (req: R, res: U) => void;
   /**
    * The method that is called when an error occurs
    */
-  onError?: <T extends NextApiRequest, U extends NextApiResponse>(
+  onError?: <R extends NextApiRequest, U extends NextApiResponse>(
     err: AuthError,
-    req: T,
+    req: R,
     res: U
-  ) => Promise<void> | void;
+  ) => void;
   /**
    * The method that is called when the authorization is successful
    */
-  onSucess?: <T extends NextApiRequest, U extends NextApiResponse>(
-    req: T,
-    res: U
-  ) => Promise<void> | void;
+  onSucess?: <R extends NextApiRequest, U extends NextApiResponse>(req: R, res: U) => void;
   /**
    * The method that is called when an activity is performed
    */
-  onActivity?: <T extends NextApiRequest>(options: ActivityCallbackOptions<T>) => Promise<void>;
+  onActivity?: <R extends NextApiRequest>(options: ActivityCallbackOptions<T, R>) => Promise<void>;
 }
 
 /**
  * The options for the `NextRoleManager` class
- * @extends IAuthManagerOptions
  */
-interface INextRoleManagerOptions {
+interface INextRoleManagerOptions<T extends Roles<T>> {
   /**
-   * The roles that are used for authorization
+   * The schema that is used to authorize the request
    */
-  roles: { [key: string]: IRole };
-  /**
-   * The resources that are available to the `ExpressRoleManager` instance
-   * @default []
-   */
-  resources: string[];
+  schema: Schema<T>;
   /**
    * The method that is called when an error occurs
    */
-  onError?: <T extends NextApiRequest, U extends NextApiResponse>(
+  onError?: <R extends NextApiRequest, U extends NextApiResponse>(
     err: AuthError,
-    req: T,
+    req: R,
     res: U
-  ) => Promise<void> | void;
+  ) => void;
   /**
-   * The method that is called when the request is authorized
+   * The method that is called when the authorization is successful
    */
-  onSucess?: <T extends NextApiRequest, U extends NextApiResponse>(
-    req: T,
-    res: U
-  ) => Promise<void> | void;
+  onSucess?: <R extends NextApiRequest, U extends NextApiResponse>(req: R, res: U) => void;
   /**
    * The method that is called when an activity is performed
    */
-  onActivity?: <T extends NextApiRequest>(options: ActivityCallbackOptions<T>) => Promise<void>;
+  onActivity?: <R extends NextApiRequest>(options: ActivityCallbackOptions<T, R>) => Promise<void>;
 }
 
 export type {
-  INextAutorizeOptions,
+  ActivityCallbackOptions,
   INextRoleManager,
   INextRoleManagerOptions,
-  ActivityCallbackOptions
+  TNextCheckOptions
 };

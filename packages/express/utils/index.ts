@@ -1,24 +1,29 @@
-import express, { Request } from 'express';
-import request from 'supertest';
-import { Role } from '@iamjs/core';
+import { Role, Schema } from '@iamjs/core';
 import { ExpressRoleManager } from '@iamjs/express';
+import express from 'express';
+import request from 'supertest';
 
-const role = new Role([
-  {
-    resource: 'resource1',
-    scopes: 'crudl'
-  },
-  {
-    resource: 'resource2',
-    scopes: 'cr-dl'
+const role = new Role({
+  name: 'role',
+  config: {
+    resource1: {
+      scopes: 'crudl'
+    },
+    resource2: {
+      scopes: 'cr-dl',
+      custom: {
+        'create a new user': false
+      }
+    }
   }
-]);
+});
+
+const schema = new Schema({
+  role
+});
 
 const roleManager = new ExpressRoleManager({
-  roles: {
-    role1: role
-  },
-  resources: ['resource1', 'resource2'],
+  schema: schema,
   onError(_err, _req, res, _next) {
     res.status(403).send('Forbidden');
   },
@@ -29,20 +34,13 @@ const roleManager = new ExpressRoleManager({
 
 const app = express();
 
-type IAuthRequest = Request & {
-  role: string;
-  permissions: any;
-};
-
 app.get(
   '/resource1',
-  (req, _res, next) => {
-    req.role = 'role1';
-    next();
-  },
-  roleManager.authorize<IAuthRequest>({
-    resource: 'resource1',
-    action: ['create', 'update']
+  roleManager.check({
+    resources: 'resource1',
+    actions: ['create', 'update'],
+    role: 'role',
+    strict: true
   }),
   (_req, res) => {
     res.send('Hello World!');
@@ -51,13 +49,11 @@ app.get(
 
 app.get(
   '/resource2',
-  (req, _res, next) => {
-    (req as unknown as IAuthRequest).role = 'role1';
-    next();
-  },
-  roleManager.authorize({
-    resource: 'resource2',
-    action: ['create', 'update']
+  roleManager.check({
+    resources: 'resource2',
+    actions: ['create', 'update'],
+    role: 'role',
+    strict: true
   }),
   (_req, res) => {
     res.send('Hello World!');
@@ -66,14 +62,10 @@ app.get(
 
 app.get(
   '/loose',
-  (req, _res, next) => {
-    (req as unknown as IAuthRequest).role = 'role1';
-    next();
-  },
-  roleManager.authorize({
-    resource: 'resource2',
-    action: ['create', 'update'],
-    loose: true
+  roleManager.check({
+    resources: 'resource2',
+    actions: ['create', 'update'],
+    role: 'role'
   }),
   (_req, res) => {
     res.send('Hello World!');
@@ -82,13 +74,11 @@ app.get(
 
 app.get(
   '/multiple',
-  (req, _res, next) => {
-    (req as unknown as IAuthRequest).role = 'role1';
-    next();
-  },
-  roleManager.authorize({
-    resource: ['resource1', 'resource2'],
-    action: ['create', 'update']
+  roleManager.check({
+    resources: ['resource1', 'resource2'],
+    actions: ['create', 'update'],
+    strict: true,
+    role: 'role'
   }),
   (_req, res) => {
     res.send('Hello World!');
@@ -97,15 +87,13 @@ app.get(
 
 app.get(
   '/from-permissions',
-  (req, _res, next) => {
-    (req as unknown as IAuthRequest).role = 'role1';
-    (req as unknown as IAuthRequest).permissions = role.toObject();
-    next();
-  },
-  roleManager.authorize({
-    resource: 'resource1',
-    action: ['create', 'update'],
-    usePermissionKey: true
+  roleManager.check({
+    resources: 'resource1',
+    actions: ['create', 'update'],
+    construct: true,
+    data: async () => {
+      return role.toObject();
+    }
   }),
   (_req, res) => {
     res.send('Hello World!');

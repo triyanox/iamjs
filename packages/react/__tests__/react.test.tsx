@@ -1,58 +1,27 @@
-import { PermissionProvider } from '@iamjs/react';
 import '@testing-library/jest-dom';
-import { act, render } from '@testing-library/react';
-import { PermissionProviderTestComponent, PermissionsStingTestComponent } from '../utils';
+import { render } from '@testing-library/react';
+// @ts-ignore
+import React from 'react';
+import { CanComponent, TestBuildRole, TestShowComponent } from '../utils';
 
-describe('PermissionProvider', () => {
-  it('should set and get permissions correctly', async () => {
-    const { getByTestId } = render(
-      <PermissionProvider>
-        <PermissionProviderTestComponent />
-      </PermissionProvider>
-    );
-
-    expect(getByTestId('books-create-permission')).toHaveTextContent('false');
-    const setPermButton = getByTestId('set-perm-button');
-
-    await act(async () => {
-      setPermButton.click();
-    });
+describe('Can', () => {
+  it('Should check the permissions on the resource', async () => {
+    const { getByTestId } = render(<CanComponent />);
     expect(getByTestId('books-create-permission')).toHaveTextContent('true');
   });
 });
 
-describe('FromJson', () => {
-  it('should set and get permissions correctly', async () => {
-    const { getByTestId } = render(
-      <PermissionProvider>
-        <PermissionProviderTestComponent />
-      </PermissionProvider>
-    );
-
-    expect(getByTestId('books-create-permission')).toHaveTextContent('false');
-    const setPermButton = getByTestId('set-perm-button');
-
-    await act(async () => {
-      setPermButton.click();
-    });
+describe('Show the component', () => {
+  it('Should render the component', async () => {
+    const { getByTestId } = render(<TestShowComponent />);
+    expect(getByTestId('books-create-permission')).toBeVisible();
     expect(getByTestId('books-create-permission')).toHaveTextContent('true');
   });
 });
 
 describe('PermissionString', () => {
   it('should set and get permissions correctly', async () => {
-    const { getByTestId } = render(
-      <PermissionProvider>
-        <PermissionsStingTestComponent />
-      </PermissionProvider>
-    );
-
-    expect(getByTestId('books-read-permission')).toHaveTextContent('false');
-    const setPermButton = getByTestId('set-perm-button');
-
-    await act(async () => {
-      setPermButton.click();
-    });
-    expect(getByTestId('books-read-permission')).toHaveTextContent('true');
+    const { getByTestId } = render(<TestBuildRole />);
+    expect(getByTestId('books-create-permission')).toHaveTextContent('false');
   });
 });

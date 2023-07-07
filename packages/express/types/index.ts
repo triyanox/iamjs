@@ -1,71 +1,22 @@
+import { AuthError, IAuthManager, Roles, Schema, TAutorizeOptions } from '@iamjs/core';
 import { NextFunction, Request, Response } from 'express';
-import { IAuthManager, IRole, permission, AuthError } from '@iamjs/core';
-
-/**
- * We used declaration merging to add the `role` and `permissions` keys to the `Request` interface
- * @see https://www.typescriptlang.org/docs/handbook/declaration-merging.html
- * ***********************************************************************************************
- * you can use this to add the keys to the `Request` interface
- */
-declare global {
-  namespace Express {
-    interface Request {
-      role: string;
-      permissions: Record<string, Record<permission, boolean>>;
-    }
-  }
-}
-
-/**
- * The interface for the `authorize` method
- */
-interface IExpressAutorizeOptions {
-  /**
-   * The key that is used to get the role from the request object
-   * @default 'role'
-   */
-  roleKey?: string;
-  /**
-   * The action or actions that are authorized to be executed on the resource
-   */
-  action?: permission | permission[];
-  /**
-   * The resource or resources that are authorized to be accessed
-   */
-  resource: string | string[];
-  /**
-   * If the permissions are used from the request object
-   * @default false
-   */
-  usePermissionKey?: boolean;
-  /**
-   * The key that is used to get the permissions from the request object
-   * @default 'permissions'
-   */
-  permissionsKey?: string;
-  /**
-   * If the permissions should be checked in a loose way
-   * @default false
-   */
-  loose?: boolean;
-}
 
 /**
  * The options for the `onActivity` method
  */
-type ActivityCallbackOptions<T extends Request = Request> = {
+type ActivityCallbackOptions<T extends Roles<T>, R extends Request = Request> = {
   /**
    * The action or actions that are authorized to be executed on the resource
    */
-  action?: permission | permission[];
+  actions?: TAutorizeOptions<T>['actions'];
   /**
    * The resource or resources that are authorized to be accessed
    */
-  resource?: string | string[];
+  resources?: TAutorizeOptions<T>['resources'];
   /**
    * The role that is used to authorize the request
    */
-  role?: string;
+  role?: keyof T | 'constrcuted';
   /**
    * The permissions that are used to authorize the request
    */
@@ -73,80 +24,87 @@ type ActivityCallbackOptions<T extends Request = Request> = {
   /**
    * The request object
    */
-  req?: T;
+  req?: R;
 };
+
+type TExpressCheckOptions<T extends Roles<T>> = Omit<TAutorizeOptions<T>, 'data'> &
+  (
+    | {
+        data: (req: Request) => Promise<string | object>;
+        construct: boolean;
+      }
+    | {
+        role: keyof T;
+      }
+  );
 
 /**
  * The interface for the `ExpressRoleManager` class
  * @extends IAuthManager
  */
-interface IExpressRoleManager extends IAuthManager {
+interface IExpressRoleManager<T extends Roles<T>> extends IAuthManager<T> {
+  /**
+   * `AuthManager` schema
+   */
+  schema: Schema<T>;
   /**
    * The method that is used to authorize a request
    * ***********************************************************************************************
-   * We used declaration merging to add the `role` and `permissions` keys to the `Request` interface
+   * You can declaration merging to add the `role` or `data` keys to the `Request` interface
    * @see https://www.typescriptlang.org/docs/handbook/declaration-merging.html
-   * ***********************************************************************************************
-   * you can use this to add the keys to the `Request` interface
    */
-  authorize: <T extends Request, U extends Response>(
-    options: IExpressAutorizeOptions
-  ) => (req: T, res: U, next: NextFunction) => void;
+  check: <R extends Request, U extends Response>(
+    options: TExpressCheckOptions<T>
+  ) => (req: R, res: U, next: NextFunction) => void;
   /**
    * The method that is called when an error occurs
    */
-  onError?: <T extends Request, U extends Response>(
+  onError?: <R extends Request, U extends Response>(
     err: AuthError,
-    req: T,
+    req: R,
     res: U,
     next: NextFunction
   ) => void;
   /**
    * The method that is called when the authorization is successful
    */
-  onSucess?: <T extends Request, U extends Response>(req: T, res: U, next: NextFunction) => void;
+  onSucess?: <R extends Request, U extends Response>(req: R, res: U, next: NextFunction) => void;
   /**
    * The method that is called when an activity is performed
    */
-  onActivity?: <T extends Request>(options: ActivityCallbackOptions<T>) => Promise<void>;
+  onActivity?: <R extends Request>(options: ActivityCallbackOptions<T, R>) => Promise<void>;
 }
 
 /**
  * The options for the `ExpressRoleManager` class
  */
-interface IExpressRoleManagerOptions {
+interface IExpressRoleManagerOptions<T extends Roles<T>> {
   /**
-   * The roles that are available to the `ExpressRoleManager` instance
-   * @default {}
+   * The schema that is used to authorize the request
    */
-  roles: { [key: string]: IRole };
-  /**
-   * The resources that are available to the `ExpressRoleManager` instance
-   * @default []
-   */
-  resources: string[];
+  schema: Schema<T>;
   /**
    * The method that is called when an error occurs
    */
-  onError?: <T extends Request, U extends Response>(
+  onError?: <R extends Request, U extends Response>(
     err: AuthError,
-    req: T,
+    req: R,
     res: U,
     next: NextFunction
   ) => void;
   /**
    * The method that is called when the authorization is successful
    */
-  onSucess?: <T extends Request, U extends Response>(req: T, res: U, next: NextFunction) => void;
+  onSucess?: <R extends Request, U extends Response>(req: R, res: U, next: NextFunction) => void;
   /**
    * The method that is called when an activity is performed
    */
-  onActivity?: <T extends Request>(options: ActivityCallbackOptions<T>) => Promise<void>;
+  onActivity?: <R extends Request>(options: ActivityCallbackOptions<T, R>) => Promise<void>;
 }
 
 export type {
+  ActivityCallbackOptions,
   IExpressRoleManager,
   IExpressRoleManagerOptions,
-  IExpressAutorizeOptions,
-  ActivityCallbackOptions
+  TExpressCheckOptions
 };
