@@ -12,7 +12,6 @@ const role = new Role({
     resource2: {
       scopes: 'cr-dl',
       custom: {
-        'hfkas fjahfjas': true,
         'create a new user': false
       }
     }

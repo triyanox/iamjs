@@ -3,3 +3,4 @@
 # `iamjs/core`
 
 This package contains the core functionality of iamjs a library for easy role and permissions management for your application.
+
