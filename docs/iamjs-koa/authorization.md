@@ -1,59 +1,57 @@
 # Authorization
 
-You can use the `KoaRoleManager` to authorize a request in your koa application by creating a new instance and using the `authorize` method.
-
-The `KoaRoleManager` constructor accepts an object with the following properties:
-
-* `roles` - An object containing the roles that can be used to authorize a request.
-* `resources` - A resource or an array of resources being accessed by the user.
+You can use the `KoaRoleManager` to authorize a request in your koa application by creating a new instance and using the `check` method.
 
 Example:
 
 ```ts
-import { Role } from '@iamjs/core';
-import { KoaRoleManager } from '@iamjs/koa';
+import { Role, Schema } from '@iamjs/core';
+import { ExpressRoleManager } from '@iamjs/koa';
+import Koa from 'koa';
 import Router from 'koa-router';
-import koa from 'koa';
 
-const app = new Koa();
-
-const role = new Role([
-  {
-    resource: 'user',
-    scopes: 'cr---',
-  },
-  {
-    resource: 'post',
-    scopes: 'crudl',
-  },
-]);
-
-const router = new Router();
-
-const roleManager = new KoaRoleManager({
-  roles: {
-    user: role,
-  },
-  resources: ['user', 'post'],
-});
-
-router.get('/post', 
-  (ctx, next) => {
-    ctx.role = 'user';
-    await next();
-  },
-  roleManager.authorize({
-    resource: 'user',
-    action: ['read', 'create'],
-  }), 
-  (ctx) => {
-    ctx.body = 'Hello World!';
+const role = new Role({
+  name: 'role',
+  config: {
+    resource1: {
+      scopes: 'crudl'
+    },
+    resource2: {
+      scopes: 'cr-dl'
+    }
   }
 });
 
-app.use(router.routes());
-
-app.listen(3000, () => {
-  console.log('Example app listening at http://localhost:3000');
+const schema = new Schema({
+  role
 });
+
+const roleManager = new KoaRoleManager({
+  schema,
+  async onError(_err, ctx, next) {
+    ctx.status = 403;
+    ctx.body = 'Forbidden';
+    await next();
+  },
+  async onSuccess(ctx, next) {
+    ctx.status = 200;
+    ctx.body = 'Hello World from the success handler!';
+    await next();
+  }
+});
+
+router.get(
+  '/resource1',
+  roleManager.check({
+    resources: 'resource1',
+    actions: ['create', 'update'],
+    role: 'role',
+    strict: true
+  }),
+  (_req, res) => {
+    res.send('Hello World!');
+  }
+);
+
+app.use(router.routes());
 ```

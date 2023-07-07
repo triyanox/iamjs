@@ -1,69 +1,56 @@
 # Advanced Usage
 
-The `authorize` method accepts an object with the following properties:
-
-| Property           | Type                   | Description                                                                | Default         |
-| ------------------ | ---------------------- | -------------------------------------------------------------------------- | --------------- |
-| `roleKey`          | `string`               | The key to use to get the role from the request.                           | `'role'`        |
-| `resource`         | `string`               | The resource being accessed by the user.                                   | `undefined`     |
-| `action`           | `string` \| `string[]` | The action being performed on the resource.                                | `undefined`     |
-| `usePermissionKey` | `boolean`              | Whether to use the `permissionKey` to get the permission from the request. | `false`         |
-| `permissionKey`    | `string`               | The key to use to get the permission from the request.                     | `'permissions'` |
-| `loose`            | `boolean`              | Whether to use loose mode.                                                 | `false`         |
-
-Example:
-
 ```ts
-import { Role } from '@iamjs/core';
-import { KoaRoleManager } from '@iamjs/koa';
-import koa from 'koa';
+import { Role, Schema } from '@iamjs/core';
+import { ExpressRoleManager } from '@iamjs/koa';
+import Koa from 'koa';
 import Router from 'koa-router';
 
-const app = koa();
-
-const role = new Role([
-  {
-    resource: 'user',
-    scopes: 'cr---',
-  },
-  {
-    resource: 'post',
-    scopes: 'crudl',
-  },
-]);
-
-const roleManager = new KoaRoleManager({
-  roles: {
-    user: role,
-  },
-  resources: ['user', 'post'],
+const role = new Role({
+  name: 'role',
+  config: {
+    resource1: {
+      scopes: 'crudl'
+    },
+    resource2: {
+      scopes: 'cr-dl'
+    }
+  }
 });
 
-const router = new Router();
+const schema = new Schema({
+  role
+});
 
-const auth = async (ctx, next) => {
-  ctx.role = 'user';
-  ctx.permissions = role.toObject();
-  await next();
-};
+const roleManager = new KoaRoleManager({
+  schema,
+  async onError(_err, ctx, next) {
+    ctx.status = 403;
+    ctx.body = 'Forbidden';
+    await next();
+  },
+  async onSuccess(ctx, next) {
+    ctx.status = 200;
+    ctx.body = 'Hello World from the success handler!';
+    await next();
+  }
+});
 
-router.get('/post', 
-  auth,
-  roleManager.authorize({
-    roleKey: 'role',
-    resource: 'user',
-    action: ['read', 'create'],
-    usePermissionKey: true,
-    permissionKey: 'permissions',
-  }), 
-  (ctx) => {
-    ctx.body = 'Hello World!';
+router.get(
+  '/resource1',
+  roleManager.check({
+    resources: 'resource1',
+    actions: ['create', 'update'],
+    strict: true,
+    // get the role json or object from the request
+    data: async (ctx) => {
+      return ctx.permissions
+    }
+  }),
+  (_req, res) => {
+    res.send('Hello World!');
   }
 );
 
 app.use(router.routes());
-
-app.listen(3000, () => {
-  console.log('Example app listening at http://localhost:3000');
-});
 ```
