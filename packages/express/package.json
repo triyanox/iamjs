@@ -43,6 +43,6 @@
     "vite-plugin-dts": "^2.2.0"
   },
   "dependencies": {
-    "@iamjs/core": "^0.3.1"
+    "@iamjs/core": "^1.0.1"
   }
 }

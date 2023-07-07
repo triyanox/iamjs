@@ -46,6 +46,6 @@
   },
   "gitHead": "25eac252720288b823c4847328c9ac66efda0f4d",
   "dependencies": {
-    "@iamjs/core": "^0.3.1"
+    "@iamjs/core": "^1.0.1"
   }
 }
