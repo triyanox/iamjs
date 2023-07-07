@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/koa",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "This package contains middleware for integrating the authorization library into a Koa application. ",
   "keywords": [
     "iamjs",
