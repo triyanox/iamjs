@@ -1,36 +1,56 @@
 # Show component based on permission
 
-The `show` function provided by the `usePerm` hook allows you to conditionally show or hide components based on the permissions of a given role. It takes two arguments: the resource and action(s) you want to check permissions for. If the role associated with the `usePerm` hook has permission to perform the specified action(s) on the specified resource, the function returns `true`, otherwise it returns `false`.
+This example also demonstrates the usage of the Show component for conditional rendering based on the user's permssions.
 
-```tsx
-import { usePerm, PermissionProvider } from '@iamjs/react';
+1. Import the necessary components and functions from the packages:
 
-const role = new Role([
-  {
-    resource: 'books',
-    scopes: '----l'
-  }
-]);
-
-const App = () => {
-  return (
-    <PermissionProvider>
-      <Component />
-    </PermissionProvider>
-  );
-};
-
-const Component = () => {
-  const { show } = usePerm(role);
-
-  return (
-    <>
-      {show('books', 'create') && <div>Can create</div>}
-      {show('books:create') && <div>Can create</div>}
-      {show('books', ['create', 'read']) && <div>Can create and read</div>}
-    </>
-  );
-};
+```javascript
+import { Role } from '@iamjs/core';
+import { createSchema, useAuthorization } from '@iamjs/react';
 ```
 
-In the example code above, the `show` function is used to conditionally render three `div` elements based on the permissions of the `role` object. The first `div` will only be rendered if the role has permission to create books, the second `div` will only be rendered if the role has permission to create books using the `books:create` syntax, and the third `div` will only be rendered if the role has permission to create and read books.
+2. Create a schema using the `createSchema` function:
+
+```javascript
+const schema = createSchema({
+  user: new Role({
+    name: 'user',
+    description: 'User role',
+    meta: {
+      name: 'user'
+    },
+    config: {
+      books: {
+        scopes: 'crudl',
+        custom: {
+          upgrade: true,
+          downgrade: false,
+          sort: true
+        }
+      }
+    }
+  })
+});
+```
+
+The schema is created in the same way as in the previous example, with a role named 'user' and its permissions for the 'books' resource.
+
+3. Use the `useAuthorization` hook to access the authorization components:
+
+```javascript
+const { Show } = useAuthorization(schema);
+```
+
+The `useAuthorization` hook is used to access the authorization components. In this example, only the `Show` component is extracted from the returned object.
+
+4. Render the `Show` component with the appropriate props:
+
+```javascript
+<Show role="user" resources="books" actions="create">
+  <div>can show</div>
+</Show>
+```
+
+The `Show` component is used to conditionally render the child components based on the user's role and permissions. It takes props specifying the role, resources, and actions, and renders the child components if the user has permission.&#x20;
+
+In summary, this example demonstrates how to use the `Show` component from the `@iamjs/react` package to conditionally render components based on the user's role and permissions. The component is rendered within the `Show` component's block if the user has the specified role, resources, and actions.

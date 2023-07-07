@@ -1,70 +1,54 @@
 # Basic usage
 
-The `usePerm` hook from `@iamjs/react` allows you to get or set permissions for a role in a React component.
+This example demonstrates the usage of the `@iamjs/core` and `@iamjs/react` packages for role-based authorization.
 
-To use the `usePerm` hook, first create a role object using the `Role` class from `@iamjs/core`.
+1. Import the necessary components and functions from the packages:
 
-Then, wrap your component hierarchy with a `PermissionProvider` component from `@iamjs/react`.
-
-```jsx
-import { usePerm, PermissionProvider } from '@iamjs/react';
+```javascript
 import { Role } from '@iamjs/core';
-
-const role = new Role([
-  {
-    resource: 'books',
-    scopes: '----l'
-  }
-]);
-
-const App = () => {
-  return (
-    <PermissionProvider>
-      <Component />
-    </PermissionProvider>
-  );
-};
+import { createSchema, useAuthorization } from '@iamjs/react';
 ```
 
-In your component, use the `usePerm` hook to access the permissions for the role. The `usePerm` hook returns an object which includes: `getPerm` and `setPerm`.
+2. Create a schema using the `createSchema` function:
 
-```jsx
-const Component = () => {
-  const { setPerm, getPerm } = usePerm(role);
-
-  const handleSetPerm = () => {
-    setPerm('books', 'create', true);
-    setPerm('books', ['create', 'read'], true);
-  }; 
-
-  return (
-    <>
-      <div> 
-        {getPerm('books', 'create').toString()}
-        {getPerm('books:create').toString()}
-        {getPerm('books', ['create', 'read']).toString()}
-      </div>
-      <button onClick={handleSetPerm}>
-        Set Permission
-      </button>
-    </>
-  );
-};
+```javascript
+const schema = createSchema({
+  user: new Role({
+    name: 'user',
+    description: 'User role',
+    meta: {
+      name: 'user'
+    },
+    config: {
+      books: {
+        scopes: 'crudl',
+        custom: {
+          upgrade: true,
+          downgrade: false,
+          sort: true
+        }
+      }
+    }
+  })
+});
 ```
 
-You can use `getPerm` to check the value of a specific permission for a given resource and action. You can pass in either a string in the format `'resource:action'` or separate arguments for the resource and action.
+In this example, the schema is created with a single role named 'user'. The role has a description, meta data, and configuration for the 'books' resource. The 'books' resource has 'crudl' scopes (create, read, update, delete, list), and additional custom permissions such as 'upgrade', 'downgrade', and 'sort'.
 
-To set a permission, use `setPerm` and pass in the resource, action, and the new permission value. You can also set permissions for multiple actions at once by passing in an array of actions.
+3. Use the `useAuthorization` hook to access the authorization methods:
 
-Note that the `setPerm` function does not persist changes to a database or storage. If you need to persist changes, you will need to handle that separately.
+```javascript
+const { can } = useAuthorization(schema);
+```
 
-The `usePerm` hook returns an object with the following properties:
+The `useAuthorization` hook takes the schema as a parameter and returns an object that includes the `can` method to check permissions.
 
-| Property      | Type                                                                                       | Description                                  |
-| ------------- | ------------------------------------------------------------------------------------------ | -------------------------------------------- |
-| `getPerm`     | `(resource: string, permission: string \| string[]) => boolean \| Record<string, boolean>` | Get permission or permission for a resource. |
-| `setPerm`     | `(resource: string, permission: string \| string[], grant: boolean) => void`               | Set permission or permission for a resource. |
-| `show`        | `(resource: string, scope: string \| string[]) => boolean`                                 | Show component based on permission.          |
-| `load`        | `(role: Role \| RoleJSON) => void`                                                         | Load role.                                   |
-| `permissions` | `Record<string, Record<permission, boolean>>`                                              | Get all permissions.                         |
-| `generate`    | `(type: 'json' \| 'object')`                                                               | Generate the updated permission string.      |
+4. Use the `can` method to check if the user has permission:
+
+```javascript
+const canDo = can('user', 'books', 'create').toString(); // 'true'
+```
+
+The `can` method is called with the role name ('user'), the resource name ('books'), and the action ('create'). It returns a boolean value indicating whether the user with the 'user' role has permission to create books.
+
+In summary, this example demonstrates how to create a schema with a role and its permissions using the `@iamjs/core` package. Then, the `@iamjs/react` package is used to access the `useAuthorization` hook and check permissions using the `can` method.&#x20;

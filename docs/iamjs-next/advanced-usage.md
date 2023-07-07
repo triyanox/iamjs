@@ -1,63 +1,62 @@
 # Advanced Usage
 
-The `authorize` method accepts an object with the following properties:
-
-| Property           | Type                   | Description                                                                | Default         |
-| ------------------ | ---------------------- | -------------------------------------------------------------------------- | --------------- |
-| `roleKey`          | `string`               | The key to use to get the role from the request.                           | `'role'`        |
-| `resource`         | `string`               | The resource being accessed by the user.                                   | `undefined`     |
-| `action`           | `string` \| `string[]` | The action being performed on the resource.                                | `undefined`     |
-| `usePermissionKey` | `boolean`              | Whether to use the `permissionKey` to get the permission from the request. | `false`         |
-| `permissionKey`    | `string`               | The key to use to get the permission from the request.                     | `'permissions'` |
-| `loose`            | `boolean`              | Whether to use loose mode.                                                 | `false`         |
-
-and a next api handler that will be called if the request is authorized.
-
 Example:
 
 ```ts
-import { Role } from '@iamjs/core';
+import { Role, Schema } from '@iamjs/core';
 import { NextRoleManager } from '@iamjs/next';
 import next from 'next';
 
-const role = new Role([
-  {
-    resource: 'user',
-    scopes: 'cr---',
-  },
-  {
-    resource: 'post',
-    scopes: 'crudl',
-  },
-]);
+const role = new Role({
+  name: 'role',
+  config: {
+    resource1: {
+      scopes: 'crudl'
+    },
+    resource2: {
+      scopes: 'cr-dl',
+      custom: {
+        'create a new user': false
+      }
+    }
+  }
+});
+
+const schema = new Schema({
+  role
+});
 
 const roleManager = new NextRoleManager({
-  roles: {
-    user: role,
+  schema: schema,
+  onSuccess: (req, res) => {
+    res.status(200).send('Hello World!');
   },
-  resources: ['user', 'post'],
+  onError: (err, req, res) => {
+    console.error(err);
+    res.status(403).send('Forbidden');
+  }
 });
 
 const withAuth = (handler) => {
   return (req, res) => {
-    req.role = 'user';
     req.permissions = role.toObject();
     return handler(req, res);   
   };
 };
 
-const handler = roleManager.authorize(
-  {
-    roleKey: 'role',
-    resource: 'comment',
-    action: ['create', 'update'],
-    usePermissionKey: true,
-    permissionKey: 'permissions',
-  },
-  (req, res) => {
-    res.status(200).send('Hello World!');
-  }
-);
+const handler = roleManager.check(
+    (_req, res) => {
+      res.status(200).send('Hello World!');
+    },
+    {
+      resources: 'resource2',
+      actions: ['create', 'update'],
+      strict: true,
+      construct: true, // to use the data from the request to build the role's permissions
+      data: async (req)=>{
+        return req.permissions
+      }
+});
 
 export default withAuth(handler);
 ```

@@ -5,26 +5,31 @@ You can pass `onSuccess` and `onError` handlers to the `NextRoleManager` constru
 Example:
 
 ```ts
-import { Role } from '@iamjs/core';
+import { Role, Schema } from '@iamjs/core';
 import { NextRoleManager } from '@iamjs/next';
 import next from 'next';
 
-const role = new Role([
-  {
-    resource: 'user',
-    scopes: 'cr---',
-  },
-  {
-    resource: 'post',
-    scopes: 'crudl',
-  },
-]);
+const role = new Role({
+  name: 'role',
+  config: {
+    resource1: {
+      scopes: 'crudl'
+    },
+    resource2: {
+      scopes: 'cr-dl',
+      custom: {
+        'create a new user': false
+      }
+    }
+  }
+});
+
+const schema = new Schema({
+  role
+});
 
 const roleManager = new NextRoleManager({
-  roles: {
-    user: role,
-  },
-  resources: ['user', 'post'],
+  schema: schema,
   onSuccess: (req, res) => {
     res.status(200).send('Hello World!');
   },
@@ -36,24 +41,24 @@ const roleManager = new NextRoleManager({
 
 const withAuth = (handler) => {
   return (req, res) => {
-    req.role = 'user';
     req.permissions = role.toObject();
     return handler(req, res);   
   };
 };
 
-const handler = roleManager.authorize(
-  {
-    roleKey: 'role',
-    resource: 'comment',
-    action: ['create', 'update'],
-    usePermissionKey: true,
-    permissionKey: 'permissions',
-  },
-  (req, res) => {
-    res.status(200).send('Hello World!');
-  }
-);
+const handler = roleManager.check(
+    (_req, res) => {
+      res.status(200).send('Hello World!');
+    },
+    {
+      resources: 'resource2',
+      actions: ['create', 'update'],
+      strict: true,
+      construct: true, // to use the data from the request to build the role's permissions
+      data: async (req)=>{
+        return req.permissions
+      }
+});
 
 export default withAuth(handler);
 ```

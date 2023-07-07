@@ -9,52 +9,51 @@ import express from 'express';
 
 const app = express();
 
-const role = new Role([
-  {
-    resource: 'user',
-    scopes: 'cr---',
-  },
-  {
-    resource: 'post',
-    scopes: 'crudl',
-  },
-]);
+const role = new Role({
+  name: 'role',
+  config: {
+    resource1: {
+      scopes: 'crudl'
+    },
+    resource2: {
+      scopes: 'cr-dl',
+      custom: {
+        'create a new user': false
+      }
+    }
+  }
+});
+
+const schema = new Schema({
+  role
+});
 
 const roleManager = new ExpressRoleManager({
-  roles: {
-    user: role,
-  },
-  resources: ['user', 'post'],
-  onSuccess: (req, res, next) => {
-    res.send('Hello World!');
-  },
-  onError: (err, req, res, next) => {
-    console.error(err);
+  schema: schema,
+  onError(_err, _req, res, _next) {
     res.status(403).send('Forbidden');
   },
-  async onActivity(data) {
-   // save the activity
+  onSucess(_req, res, _next) {
+    res.status(200).send('Hello World from the success handler!');
   },
+  async onActivity(data){
+    console.log(data)
+  }
 });
 
-const auth = async (req, res, next) => {
-  req.role = 'user';
-  req.permissions = user.toObject();
-  next();
-};
 
-app.get('/post', 
-  auth,
-  roleManager.authorize({
-    roleKey: 'role',
-    resource: 'user',
-    action: ['read', 'create'],
-    usePermissionKey: true,
-    permissionKey: 'permissions',
-  }), 
-  (req, res) => {
-  res.send('Hello World!');
-});
+app.get(
+  '/resource1',
+  roleManager.check({
+    resources: 'resource1',
+    actions: ['create', 'update'],
+    role: 'role',
+    strict: true
+  }),
+  (_req, res) => {
+    res.send('Hello World!');
+  }
+);
 
 app.listen(3000, () => {
   console.log('Example app listening at http://localhost:3000');
@@ -63,12 +62,6 @@ app.listen(3000, () => {
 
 The data object contains:
 
-| Name      | Description                                                              |
-| --------- | ------------------------------------------------------------------------ |
-| action?   | The action or actions that are authorized to be executed on the resource |
-| resource? | The resource or resources that are authorized to be accessed             |
-| role?     | The role that is used to authorize the request                           |
-| success?  | The status of the request                                                |
-| req?      | The request object                                                       |
+<table><thead><tr><th width="230.5">Name</th><th>Description</th></tr></thead><tbody><tr><td>actions?</td><td>The action or actions that are authorized to be executed on the resource</td></tr><tr><td>resources?</td><td>The resource or resources that are authorized to be accessed</td></tr><tr><td>role?</td><td>The role that is used to authorize the request</td></tr><tr><td>success?</td><td>The status of the request</td></tr><tr><td>req?</td><td>The request object</td></tr></tbody></table>
 
 &#x20;

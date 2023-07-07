@@ -1,71 +1,61 @@
 # Typescript Support
 
-This package is written in typescript and has type definitions for all the exported types also the `authorize` method accepts a generic type which can be used to define the type of the request or response object.
+This package is written in typescript and has type definitions for all the exported types also the `check` method accepts a generic type which can be used to define the type of the context object.
 
 Example:
 
 ```ts
-import { Role, permission } from '@iamjs/core';
-import { KoaRoleManager } from '@iamjs/koa';
-import koa, { Context, Next } from 'koa';
+import { Role, Schema } from '@iamjs/core';
+import { ExpressRoleManager } from '@iamjs/koa';
+import Koa from 'koa';
 import Router from 'koa-router';
 
-const app = koa();
-const router = new Router();  
+const role = new Role({
+  name: 'role',
+  config: {
+    resource1: {
+      scopes: 'crudl'
+    },
+    resource2: {
+      scopes: 'cr-dl'
+    }
+  }
+});
 
-const role = new Role([
-  {
-    resource: 'user',
-    scopes: 'cr---',
-  },
-  {
-    resource: 'post',
-    scopes: 'crudl',
-  },
-]);
+const schema = new Schema({
+  role
+});
 
 interface CustomContext extends Context {
-  role: string;
-  permissions: Record<string, Record<permission, boolean>>;
+  somekey: any
 }
 
 const roleManager = new KoaRoleManager({
-  roles: {
-    user: role,
-  },
-  resources: ['user', 'post'],
-  onSuccess : <CustomContext>(ctx, next) => {
-    ctx.body = 'Hello World!';
-  },
-  onError: <CustomContext>(err, ctx, next) => {
+  schema,
+  async onError<CustomContext>(_err, ctx, next) {
     ctx.status = 403;
     ctx.body = 'Forbidden';
+    await next();
   },
+  async onSuccess<CustomContext>(ctx, next) {
+    ctx.status = 200;
+    ctx.body = 'Hello World from the success handler!';
+    await next();
+  }
 });
 
-const auth = async (ctx: CustomContext, next: Next) => {
-  ctx.role = 'user';
-  ctx.permissions = role.toObject();
-  await next();
-};
-
-router.get('/post', 
-  auth,
-  roleManager.authorize<CustomContext>({
-    roleKey: 'role',
-    resource: 'user',
-    action: ['read', 'create'],
-    usePermissionKey: true,
-    permissionKey: 'permissions',
-  }), 
-  (ctx) => {
-    ctx.body = 'Hello World!';
+router.get(
+  '/resource1',
+  roleManager.check<CustomContext>({
+    resources: 'resource1',
+    actions: ['create', 'update'],
+    role: 'role',
+    strict: true
+  }),
+  (_req, res) => {
+    res.send('Hello World!');
   }
 );
 
 app.use(router.routes());
-
-app.listen(3000, () => {
-  console.log('Example app listening at http://localhost:3000');
-});
 ```

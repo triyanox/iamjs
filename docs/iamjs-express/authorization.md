@@ -1,53 +1,54 @@
 # Authorization
 
-You can use the `ExpressRoleManager` to authorize a request in your express application by creating a new instance and using the `authorize` method.
-
-The `ExpressRoleManager` constructor accepts an object with the following properties:
-
-* `roles` - An object containing the roles that can be used to authorize a request.
-* `resources` - A resource or an array of resources being accessed by the user.
+You can use the `ExpressRoleManager` to authorize a request in your express application by creating a new instance and using the `check` method.
 
 Example:
 
-```ts
-import { Role } from '@iamjs/core';
+<pre class="language-ts"><code class="lang-ts">import { Role, Schema } from '@iamjs/core';
 import { ExpressRoleManager } from '@iamjs/express';
 import express from 'express';
 
-const app = express();
+<strong>const role = new Role({
+</strong>  name: 'role',
+  config: {
+    resource1: {
+      scopes: 'crudl'
+    },
+    resource2: {
+      scopes: 'cr-dl',
+      custom: {
+        'create a new user': false
+      }
+    }
+  }
+});
 
-const role = new Role([
-  {
-    resource: 'user',
-    scopes: 'cr---',
-  },
-  {
-    resource: 'post',
-    scopes: 'crudl',
-  },
-]);
+const schema = new Schema({
+  role
+});
 
 const roleManager = new ExpressRoleManager({
-  roles: {
-    user: role,
+  schema: schema,
+  onError(_err, _req, res, _next) {
+    res.status(403).send('Forbidden');
   },
-  resources: ['user', 'post'],
+  onSucess(_req, res, _next) {
+    res.status(200).send('Hello World from the success handler!');
+  }
 });
 
-app.get('/post',
-  (req, res, next) => {
-    req.role = 'user';
-    next();
-  },
-  roleManager.authorize({
-    resource: 'user',
-    action: ['read', 'create'],
-  }), 
-  (req, res) => {
-  res.send('Hello World!');
-});
+const app = express();
 
-app.listen(3000, () => {
-  console.log('Example app listening at http://localhost:3000');
-});
-```
+app.get(
+  '/resource1',
+  roleManager.check({
+    resources: 'resource1',
+    actions: ['create', 'update'],
+    role: 'role',
+    strict: true
+  }),
+  (_req, res) => {
+    res.send('Hello World!');
+  }
+);
+</code></pre>
