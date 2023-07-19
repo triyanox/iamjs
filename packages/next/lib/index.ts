@@ -44,7 +44,7 @@ class NextRoleManager<T extends Roles<T>> extends AuthManager<T> implements INex
     req: NextApiRequest,
     options: TNextCheckOptions<T>
   ): Promise<TAutorizeOptions<T>> {
-    if ('data' in options) {
+    if ('data' in options && options.data instanceof Function) {
       const data = await options.data(req);
       const o = options as TAutorizeOptions<T> & { data?: string | object };
       o.data = data;

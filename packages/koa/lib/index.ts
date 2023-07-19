@@ -33,7 +33,7 @@ class KoaRoleManager<T extends Roles<T>> extends AuthManager<T> implements IKoaR
     ctx: Context,
     options: TKoaCheckOptions<T>
   ): Promise<TAutorizeOptions<T>> {
-    if ('data' in options) {
+    if ('data' in options && options.data instanceof Function) {
       const data = await options.data(ctx);
       const o = options as TAutorizeOptions<T> & { data?: string | object };
       o.data = data;
