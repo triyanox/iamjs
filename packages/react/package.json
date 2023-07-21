@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/react",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "This package contains React components that can be used to easily integrate the authorization library into a React application.",
   "keywords": [
     "iamjs",
