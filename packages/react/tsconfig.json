@@ -1,8 +1,5 @@
 {
   "compilerOptions": {
-    "paths": {
-      "@iamjs/core": ["node_modules/@iamjs/core"]
-    },
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
     "module": "ESNext",
