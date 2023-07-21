@@ -40,7 +40,6 @@ type TNextCheckOptions<T extends Roles<T>> = Omit<TAutorizeOptions<T>, 'data'> &
 
 /**
  * The interface for the `NextRoleManager` class
- * @extends IAuthManager
  */
 interface INextRoleManager<T extends Roles<T>> extends IAuthManager<T> {
   /**

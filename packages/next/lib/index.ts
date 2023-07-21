@@ -9,7 +9,6 @@ import {
 
 /**
  * The class that is used to manage roles and permissions from `Next.js`
- * @extends AuthManager
  */
 class NextRoleManager<T extends Roles<T>> extends AuthManager<T> implements INextRoleManager<T> {
   public schema: Schema<T>;

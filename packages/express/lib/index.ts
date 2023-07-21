@@ -9,7 +9,6 @@ import {
 
 /**
  * The class that is used to manage roles and permissions from `Express.js`
- * @extends AuthManager
  */
 class ExpressRoleManager<T extends Roles<T>>
   extends AuthManager<T>

@@ -40,7 +40,6 @@ type TExpressCheckOptions<T extends Roles<T>> = Omit<TAutorizeOptions<T>, 'data'
 
 /**
  * The interface for the `ExpressRoleManager` class
- * @extends IAuthManager
  */
 interface IExpressRoleManager<T extends Roles<T>> extends IAuthManager<T> {
   /**

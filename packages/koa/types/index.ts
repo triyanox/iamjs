@@ -40,7 +40,6 @@ type TKoaCheckOptions<T extends Roles<T>> = Omit<TAutorizeOptions<T>, 'data'> &
 
 /**
  * The interface for the `KoaRoleManager` class
- * @extends IAuthManager
  */
 interface IKoaRoleManager<T extends Roles<T>> extends IAuthManager<T> {
   /**
