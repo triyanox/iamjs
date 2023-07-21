@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/express",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "This package contains middleware for integrating the authorization library into an Express application.",
   "keywords": [
     "iamjs",
