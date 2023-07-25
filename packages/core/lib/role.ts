@@ -115,8 +115,8 @@ class Role<T extends TRoleOptions> implements IRole<T> {
       )
     });
   }
-
-  public remove<S extends string>(options: removeOptions<S>) {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  public remove<S extends keyof this['permissions'] & (string & {})>(options: removeOptions<S>) {
     const { resource, mutate } = options;
     if (mutate) {
       delete this.config[resource];
