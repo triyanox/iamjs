@@ -1,8 +1,8 @@
 # Table of contents
 
-* [iamjs - fully featured library for easy authorization](README.md)
+* [iamjs - Effortless authorization](README.md)
 
-## 🧠 iamjs/core
+## iamjs/core
 
 * [Installation](iamjs-core/installation.md)
 * [Create a new Role instance](iamjs-core/create-a-new-role-instance.md)
@@ -17,7 +17,7 @@
   * [Load a role from a json string](iamjs-core/save-and-load-roles/load-a-role-from-a-json-string.md)
 * [Authorization](iamjs-core/authorization.md)
 
-## 🚀 iamjs/express
+## iamjs/express
 
 * [Installation](iamjs-express/installation.md)
 * [Authorization](iamjs-express/authorization.md)
@@ -26,14 +26,14 @@
 * [Typescript Support](iamjs-express/typescript-support.md)
 * [Save users activity](iamjs-express/save-users-activity.md)
 
-## ⚛ iamjs/react
+## iamjs/react
 
 * [Installation](iamjs-react/installation.md)
 * [Basic usage](iamjs-react/basic-usage.md)
 * [Show component based on permission](iamjs-react/show-component-based-on-permission.md)
 * [Build a role from its permissions](iamjs-react/build-a-role-from-its-permissions.md)
 
-## ⏭ iamjs/next
+## iamjs/next
 
 * [Installation](iamjs-next/installation.md)
 * [Authorization](iamjs-next/authorization.md)
@@ -42,7 +42,7 @@
 * [Typescript Support](iamjs-next/typescript-support.md)
 * [Save users activity](iamjs-next/save-users-activity.md)
 
-## 🐱 iamjs/koa
+## iamjs/koa
 
 * [Installation](iamjs-koa/installation.md)
 * [Authorization](iamjs-koa/authorization.md)
