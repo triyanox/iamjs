@@ -7,10 +7,10 @@ const role = new Role({
   name: 'role',
   config: {
     resource1: {
-      scopes: 'crudl'
+      base: 'crudl'
     },
     resource2: {
-      scopes: 'cr-dl',
+      base: 'cr-dl',
       custom: {
         'create a new user': false
       }
@@ -19,7 +19,7 @@ const role = new Role({
 });
 
 const schema = new Schema({
-  role
+  roles: { role }
 });
 
 const roleManager = new ExpressRoleManager({

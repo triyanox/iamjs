@@ -16,16 +16,16 @@ const role = new Role({
   name: 'role',
   config: {
     resource1: {
-      scopes: 'crudl'
+      base: 'crudl'
     },
     resource2: {
-      scopes: 'cr-dl'
+      base: 'cr-dl'
     }
   }
 });
 
 const schema = new Schema({
-  role
+  roles: { role }
 });
 
 const roleManager = new NextRoleManager({

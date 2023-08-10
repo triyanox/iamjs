@@ -1,21 +1,26 @@
-import Role from './role';
 import AuthManager from './auth';
-import Schema from './schema';
 import AuthError from './error';
+import Role from './role';
+import Schema from './schema';
 
-export { Role, AuthManager, Schema, AuthError };
 export type {
+  Actions,
   AllKeys,
+  AuthErrorCodes,
   AuthorizeConstructOptions,
   AuthorizeRoleOptions,
+  BasePermissions,
   DefaultScope,
+  GetRoleConfig,
   IAuthManager,
   IPermission,
   IRole,
   ISchema,
   InferPermissions,
   InferResources,
+  IntersectionToUnion,
   MergePermissions,
+  Resources,
   RoleAddResult,
   RoleRemoveResult,
   RoleUpdateResult,
@@ -24,16 +29,14 @@ export type {
   TAuthResources,
   TAutorizeOptions,
   TRoleOptions,
+  TSchemaOptions,
   ToJSONResult,
   ToObjectResult,
+  TransformedRole,
   addOptions,
   permission,
   permissions,
   removeOptions,
-  scopes,
-  updateOptions,
-  IntersectionToUnion,
-  AuthErrorCodes,
-  Resources,
-  Actions
+  updateOptions
 } from '../types';
+export { AuthError, AuthManager, Role, Schema };

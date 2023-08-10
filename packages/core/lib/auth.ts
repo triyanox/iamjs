@@ -22,6 +22,7 @@ class AuthManager<T extends Roles<T>> implements IAuthManager<T> {
     resources: Array<TAuthResources<U>>,
     action: Array<TAuthPermissions<U>>
   ): boolean {
+    if (!role) return false;
     return action.some((action) => {
       return resources.some((resource) => {
         return role.can(resource, action as any);
@@ -33,6 +34,7 @@ class AuthManager<T extends Roles<T>> implements IAuthManager<T> {
     resources: Array<TAuthResources<U>>,
     action: Array<TAuthPermissions<U>>
   ): boolean {
+    if (!role) return false;
     return action.every((action) => {
       return resources.every((resource) => {
         return role.can(resource, action as any);

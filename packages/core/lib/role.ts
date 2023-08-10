@@ -1,5 +1,6 @@
 import {
   DefaultScope,
+  GetRoleConfig,
   IPermission,
   IRole,
   InferPermissions,
@@ -8,7 +9,6 @@ import {
   RoleRemoveResult,
   RoleUpdateResult,
   TRoleOptions,
-  ToObjectResult,
   addOptions,
   removeOptions,
   updateOptions
@@ -32,28 +32,28 @@ class Role<T extends TRoleOptions> implements IRole<T> {
     this.description = options.description;
     this.meta = options.meta;
     this.resources = Object.keys(options.config);
-    this.permissions = this.init(options.config, this.resources as string[]);
+    this.permissions = this._init(options.config, this.resources as string[]);
   }
 
   private getDefaultPermission(p: DefaultScope) {
-    const scopes = {
+    const base = {
       c: 'create',
       r: 'read',
       u: 'update',
       d: 'delete',
       l: 'list'
     };
-    return scopes[p];
+    return base[p];
   }
 
-  private init<C extends Record<string, IPermission>, R extends InferResources<C>[]>(
+  private _init<C extends Record<string, IPermission>, R extends InferResources<C>[]>(
     config: C,
     resources: R
   ): InferPermissions<T['config']> {
     const permissions: InferPermissions<C> = {} as InferPermissions<C>;
 
     for (const resource of resources) {
-      const resourcePermissions = config[resource].scopes;
+      const resourcePermissions = config[resource].base;
       const customPermissions = config[resource].custom;
       const resourcePermissionsSet = new Set(resourcePermissions);
       const resourcePermissionsObject: any = {};
@@ -94,7 +94,7 @@ class Role<T extends TRoleOptions> implements IRole<T> {
           preserve: noOverride
         }
       );
-      this.permissions = this.init(this.config, this.resources as string[]);
+      this.permissions = this._init(this.config, this.resources as string[]);
       return this as unknown as RoleAddResult<T, S, P>;
     }
 
@@ -148,7 +148,7 @@ class Role<T extends TRoleOptions> implements IRole<T> {
           preserve: noOverride
         }
       );
-      this.permissions = this.init(this.config, this.resources as string[]);
+      this.permissions = this._init(this.config, this.resources as string[]);
       return this as unknown as RoleUpdateResult<T, S, P>;
     }
     return new Role({
@@ -209,17 +209,33 @@ class Role<T extends TRoleOptions> implements IRole<T> {
     }) as unknown as Role<T>;
   }
 
-  public toJSON() {
-    return utils.seialize({
+  /**
+   * Converts a role to a JSON string
+   * You can optionally pass in a transform function to further transform the JSON string
+   */
+  public toJSON(): string;
+  public toJSON<R>(transform?: (data: string) => R): R;
+  public toJSON<R>(transform?: (data: string) => R): string | R {
+    const result = utils.seialize({
       name: this.name,
       description: this.description,
       meta: this.meta,
       config: this.config
     });
+    if (transform) {
+      return transform(result);
+    }
+    return result;
   }
 
-  public toObject(): ToObjectResult<T> {
-    return {
+  /**
+   * Converts a role to an object
+   * You can optionally pass in a transform function to further transform the object
+   */
+  public toObject(): GetRoleConfig<T>;
+  public toObject<R>(transform?: (data: GetRoleConfig<T>) => R): R;
+  public toObject<R>(transform?: (data: GetRoleConfig<T>) => R): GetRoleConfig<T> | R {
+    const data = {
       name: this.name,
       description: this.description,
       meta: this.meta,
@@ -227,6 +243,10 @@ class Role<T extends TRoleOptions> implements IRole<T> {
       permissions: this.permissions,
       resources: this.resources
     };
+    if (transform) {
+      return transform(data);
+    }
+    return data;
   }
 
   /**
@@ -238,7 +258,7 @@ class Role<T extends TRoleOptions> implements IRole<T> {
   }
 
   /**
-   *  Creates a role from object
+   * Creates a role from object
    */
   public static fromObject<T extends TRoleOptions>(object: T) {
     const errors = this.validate(object);
@@ -251,6 +271,42 @@ class Role<T extends TRoleOptions> implements IRole<T> {
       meta: object.meta as T['meta'],
       name: object.name as T['name']
     });
+  }
+
+  /**
+   * This method can be used when you want to create a role from an unknown data source
+   * @example
+   *
+   * ```ts
+   * // create a role from an encrypted string using aes-256-cbc algorithm
+   * import crypto from 'crypto';
+   *
+   * const key = 'somekey';
+   * const iv = 'someiv';
+   * const algorithm = 'aes-256-cbc';
+   * const key_buffer = Buffer.from(key);
+   * const iv_buffer = Buffer.from(iv);
+   *
+   * const encrypted_role_json_str = 'some encrypted data';
+   *
+   * const decrypt = (data: string) => {
+   *    const decipher = crypto.createDecipheriv(algorithm, key_buffer, iv_buffer);
+   *    let decrypted = decipher.update(data, 'hex', 'utf8');
+   *    decrypted += decipher.final('utf8');
+   *    return decrypted;
+   * };
+   * const role = Role.from(encrypted_role_json_str, (data) => {
+   *    const decrypted = decrypt(data); // decrypt the data
+   *    return Role.fromJSON(decrypted).toObject(); // convert the decrypted data to a role object and return it
+   * });
+   * ```
+   */
+  public static from<T extends TRoleOptions, D>(
+    data: D,
+    transform: (data: D) => GetRoleConfig<T>
+  ): Role<GetRoleConfig<T>> {
+    const role = transform(data);
+    return new Role(role as unknown as GetRoleConfig<T>);
   }
 
   /**

@@ -2,7 +2,7 @@ import { Role } from '../lib';
 import { ConcatStrings, IntersectionToUnion, MergeObjects } from './utils.types';
 
 /**
- * Default scopes
+ * Base actions
  */
 type DefaultScope = 'c' | 'r' | 'u' | 'd' | 'l';
 /**
@@ -20,9 +20,9 @@ type permissions =
   | 'list'
   | ('create' | 'read' | 'update' | 'delete' | 'list')[];
 /**
- * The scopes used in the `IPermision` interface
+ * The base permissions used in the `IPermision` interface
  */
-type scopes = ConcatStrings<
+type BasePermissions = ConcatStrings<
   'c' | '-',
   ConcatStrings<'r' | '-', ConcatStrings<'u' | '-', ConcatStrings<'d' | '-', 'l' | '-'>>>
 >;
@@ -43,14 +43,14 @@ type InferPermissions<T extends Record<string, IPermission>> = {
  */
 interface IPermission {
   /**
-   * The default scopes as a string of **c**reate, **r**ead, **u**pdate, **d**elete, **l**ist
+   * The base permissions as a string of **c**reate, **r**ead, **u**pdate, **d**elete, **l**ist
    * @example "crudl" or "-----" or "cru--"
    */
-  scopes: scopes;
+  base: BasePermissions;
   /**
    * The custom permissions
+   * Can be used to override the base permissions too
    * @example { "publish": true, "unpublish": false }
-   * Can be used to override the default scopes too
    */
   custom?: Record<string, boolean>;
 }
@@ -341,6 +341,18 @@ interface ISchema<T extends Roles<T>> {
   getResources(): Record<keyof MergePermissions<T>, keyof MergePermissions<T>>;
 }
 
+/**
+ * The options for the `Schema` class
+ */
+type TSchemaOptions<T extends Roles<T>> = {
+  /**
+   * The roles to add to the schema
+   */
+  roles: T;
+};
+
+type TransformedRole<U extends TRoleOptions> = (role: Role<U>) => Role<U>;
+
 interface IAuthManager<T extends Roles<T>> {
   /**
    * `AuthManager` schema
@@ -381,7 +393,6 @@ type AuthorizeConstructOptions<T extends Roles<T>> = {
    * The actions to authorize
    */
   actions: Actions<T>;
-
   /**
    * The strict mode
    */
@@ -414,6 +425,13 @@ type AuthErrorCodes =
   | 'UNKNOWN_ERROR'
   | 'UNAUTHORIZED';
 
+type GetRoleConfig<T extends TRoleOptions> = ToObjectResult<{
+  name: T['name'];
+  description: T['description'];
+  config: T['config'];
+  meta: T['meta'];
+}>;
+
 export type {
   AllKeys,
   AuthErrorCodes,
@@ -442,8 +460,11 @@ export type {
   permission,
   permissions,
   removeOptions,
-  scopes,
+  BasePermissions,
   updateOptions,
   Resources,
-  Actions
+  Actions,
+  TSchemaOptions,
+  TransformedRole,
+  GetRoleConfig
 };

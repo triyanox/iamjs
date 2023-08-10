@@ -10,7 +10,7 @@ const schema = createSchema({
     },
     config: {
       books: {
-        scopes: 'crudl',
+        base: 'crudl',
         custom: {
           upgrade: true,
           downgrade: false,
@@ -47,7 +47,7 @@ const TestBuildRole = () => {
       .update({
         resource: 'books',
         permissions: {
-          scopes: '-----'
+          base: '-----'
         }
       })
       .toObject()
