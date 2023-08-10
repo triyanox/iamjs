@@ -1,18 +1,12 @@
 {
-  "packages": [
-    "packages/*",
-    "@iamjs/react",
-    "@iamjs/next",
-    "@iamjs/core",
-    "@iamjs/express",
-    "@iamjs/koa"
-  ],
+  "$schema": "https://json.schemastore.org/lerna",
+  "packages": ["@iamjs/react", "@iamjs/next", "@iamjs/core", "@iamjs/express", "@iamjs/koa"],
   "version": "independent",
   "useWorkspaces": true,
   "command": {
     "publish": {
       "allowBranch": ["main"],
-      "registry": "https://registry.npmjs.org/"
+      "registry": "https://npm.pkg.github.com"
     }
   }
 }

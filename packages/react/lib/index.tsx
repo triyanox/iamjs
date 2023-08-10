@@ -20,7 +20,9 @@ const createSchema = <
 >(
   roles: T
 ): Schema<T> => {
-  const schema = new Schema<T>(roles);
+  const schema = new Schema<T>({
+    roles
+  });
   return schema;
 };
 

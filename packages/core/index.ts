@@ -1,16 +1,22 @@
-export { AuthManager, Role, Schema, AuthError } from './lib';
+export { AuthError, AuthManager, Role, Schema } from './lib';
 export type {
+  Actions,
   AllKeys,
+  AuthErrorCodes,
   AuthorizeConstructOptions,
   AuthorizeRoleOptions,
+  BasePermissions,
   DefaultScope,
+  GetRoleConfig,
   IAuthManager,
   IPermission,
   IRole,
   ISchema,
   InferPermissions,
   InferResources,
+  IntersectionToUnion,
   MergePermissions,
+  Resources,
   RoleAddResult,
   RoleRemoveResult,
   RoleUpdateResult,
@@ -21,14 +27,10 @@ export type {
   TRoleOptions,
   ToJSONResult,
   ToObjectResult,
+  TransformedRole,
   addOptions,
   permission,
   permissions,
   removeOptions,
-  scopes,
-  updateOptions,
-  AuthErrorCodes,
-  IntersectionToUnion,
-  Resources,
-  Actions
+  updateOptions
 } from './lib';
