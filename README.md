@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/triyanox/iamjs/main/assets/logo.png" alt="iamjs logo" title="iamjs" align="right" height="50" width="50"/>
 
-# **iamjs** - fully featured library for easy authorization
+# **iamjs** - access control made easy
 
 `iamjs` is a fully-featured library that makes authorization easy. It is designed to be used in both Node.js and browser environments, and currently supports popular frameworks like express, koa, next.js, and react.
 
