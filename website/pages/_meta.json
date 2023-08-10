@@ -1,0 +1,14 @@
+{
+  "index": "Introduction",
+  "contact": {
+    "title": "Contact ↗",
+    "type": "page",
+    "href": "https://twitter.com/ac__haq",
+    "newWindow": true
+  },
+  "core": "@iamjs/core",
+  "express": "@iamjs/express",
+  "next": "@iamjs/next",
+  "react": "@iamjs/react",
+  "koa": "@iamjs/koa"
+}

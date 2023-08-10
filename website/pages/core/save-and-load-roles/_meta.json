@@ -1,0 +1,8 @@
+{
+  "index": "Reference",
+  "convert-a-role-to-a-json-string": "Convert a role to a JSON string",
+  "convert-a-role-to-object": "Convert a role to object",
+  "load-a-role-from-a-json-string": "Load a role from a JSON string",
+  "load-a-role-from-an-object": "Load a role from an object",
+  "create-a-role-from-an-unknown-data-source": "Create a role from an unknown data source"
+}

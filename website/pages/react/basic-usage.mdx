@@ -1,0 +1,54 @@
+# Basic usage
+
+This example demonstrates the usage of the `@iamjs/core` and `@iamjs/react` packages for role-based authorization.
+
+1. Import the necessary components and functions from the packages:
+
+```javascript
+import { Role } from '@iamjs/core';
+import { createSchema, useAuthorization } from '@iamjs/react';
+```
+
+2. Create a schema using the `createSchema` function:
+
+```javascript
+const schema = createSchema({
+  user: new Role({
+    name: 'user',
+    description: 'User role',
+    meta: {
+      name: 'user'
+    },
+    config: {
+      books: {
+        base: 'crudl',
+        custom: {
+          upgrade: true,
+          downgrade: false,
+          sort: true
+        }
+      }
+    }
+  })
+});
+```
+
+In this example, the schema is created with a single role named 'user'. The role has a description, meta data, and configuration for the 'books' resource. The 'books' resource has 'crudl' scopes (create, read, update, delete, list), and additional custom permissions such as 'upgrade', 'downgrade', and 'sort'.
+
+3. Use the `useAuthorization` hook to access the authorization methods:
+
+```javascript
+const { can } = useAuthorization(schema);
+```
+
+The `useAuthorization` hook takes the schema as a parameter and returns an object that includes the `can` method to check permissions.
+
+4. Use the `can` method to check if the user has permission:
+
+```javascript
+const canDo = can('user', 'books', 'create').toString(); // 'true'
+```
+
+The `can` method is called with the role name ('user'), the resource name ('books'), and the action ('create'). It returns a boolean value indicating whether the user with the 'user' role has permission to create books.
+
+In summary, this example demonstrates how to create a schema with a role and its permissions using the `@iamjs/core` package. Then, the `@iamjs/react` package is used to access the `useAuthorization` hook and check permissions using the `can` method.&#x20;

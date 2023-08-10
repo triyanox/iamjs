@@ -1,0 +1,30 @@
+# Extending a Role instance
+
+You can extend a role instance by using the `add` method.
+
+```ts
+const extended = role.add({
+    resource: 'page',
+    permissions: {
+      base: 'crudl',
+      custom: {
+        suspend: false
+      }
+    }
+}) // returns a new role instance
+
+extended.can('page', 'create') // true
+extended.can('page', 'suspend') // false
+```
+
+The `add` method allows you to extend a role instance by adding permissions for a new resource. It takes an `addOptions` object as its parameter, which includes the following properties:
+
+* `resource` (string): The name of the resource for which you want to add permissions.
+* `permissions` (object): The permissions to add for the specified resource.
+  * `base` (string): The base permissions to add for the resource. This can be a combination of create, read, update, delete, and list permissions.
+  * `custom` (object): The custom permissions to add for the resource. These can be any additional permissions specific to the resource.
+
+Additionally, there are two optional properties that you can include in the `updateOptions` object:
+
+* `mutate` (boolean, default: `false`): If set to `true`, the `update` method will mutate the existing role instance instead of returning a new instance with the updated permissions.
+* `noOverride` (boolean, default: `false`): If set to `true`, the `update` method will not override existing permissions for the specified resource. Instead, it will merge the new permissions with the existing ones.

@@ -1,0 +1,34 @@
+# Convert a role to object
+
+The `toObject` method converts the role instance to a plain JavaScript object representation. It returns a plain JavaScript object that represents the same data as the role instance.
+
+```typescript
+const role = new Role({
+    name: 'role',
+    config: {
+        user: {
+            base: 'crudl',
+            custom: {
+                ban: false
+            }
+        },
+        post: {
+            base: '-rudl',
+            custom: {
+                publish: true
+            }
+        }
+    }
+});
+
+const object = role.toObject();
+
+// or you can use transform function to shape the output
+role.toObject((data) => {
+return {
+  ...data,
+  otherKey: 'otherValue'
+};
+});
+
+```

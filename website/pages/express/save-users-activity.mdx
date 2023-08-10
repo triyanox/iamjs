@@ -1,0 +1,70 @@
+# Save users activity
+
+You can save user activity using the `onActivity` method on the **ExpressRoleManager**
+
+```typescript
+import { Role } from "@iamjs/core";
+import { ExpressRoleManager } from "@iamjs/express";
+import express from "express";
+
+const app = express();
+
+const role = new Role({
+  name: "role",
+  config: {
+    resource1: {
+      base: "crudl",
+    },
+    resource2: {
+      base: "cr-dl",
+      custom: {
+        "create a new user": false,
+      },
+    },
+  },
+});
+
+const schema = new Schema({
+  roles: { role },
+});
+
+const roleManager = new ExpressRoleManager({
+  schema: schema,
+  onError(_err, _req, res, _next) {
+    res.status(403).send("Forbidden");
+  },
+  onSucess(_req, res, _next) {
+    res.status(200).send("Hello World from the success handler!");
+  },
+  async onActivity(data) {
+    console.log(data);
+  },
+});
+
+app.get(
+  "/resource1",
+  roleManager.check({
+    resources: "resource1",
+    actions: ["create", "update"],
+    role: "role",
+    strict: true,
+  }),
+  (_req, res) => {
+    res.send("Hello World!");
+  }
+);
+
+app.listen(3000, () => {
+  console.log("Example app listening at http://localhost:3000");
+});
+```
+
+The data object contains:
+
+| Name       | Description                                                              |
+| ---------- | ------------------------------------------------------------------------ |
+| actions?   | The action or actions that are authorized to be executed on the resource |
+| resources? | The resource or resources that are authorized to be accessed             |
+| role?      | The role that is used to authorize the request                           |
+| success?   | The status of the request                                                |
+| req?       | The request object                                                       |

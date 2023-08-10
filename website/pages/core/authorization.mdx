@@ -1,0 +1,97 @@
+---
+description: >-
+  The Auth Manager class provides a powerful way to manage authorization and
+  perform access control based on roles and their permissions.
+---
+
+# Authorization
+
+#### Authorization Management with Auth Manager
+
+The Auth Manager class provides a powerful way to manage authorization and perform access control based on roles and their permissions. It allows you to define roles, create an authorization schema, and check authorization for specific actions and resources.
+
+#### Step 1: Define Roles
+
+In the code snippet, two roles, namely `user` and `admin`, are defined using the Role class. Each role is configured with specific permissions for different resources and actions.
+
+```typescript
+import { AuthManager, Role, Schema } from '@iamjs/core';
+ 
+ const roles = {
+    user: new Role({
+      name: 'user',
+      config: {
+        user: {
+          base: '-r--l',
+          custom: {
+            ban: false
+          }
+        },
+        post: {
+          base: 'crudl',
+          custom: {
+            publish: true
+          }
+        }
+      }
+    }),
+    admin: new Role({
+      name: 'user',
+      config: {
+        user: {
+          base: 'crudl',
+          custom: {
+            ban: true
+          }
+        },
+        post: {
+          base: 'crudl',
+          custom: {
+            publish: true
+          }
+        }
+      }
+    })
+  };
+```
+
+#### Step 2: Create an Authorization Schema
+
+To manage authorization, a schema is created using the Schema class and initialized with the defined roles.
+
+```typescript
+  const schema = new Schema({ roles });
+  const auth = new AuthManager(schema);
+```
+
+#### Step 3: Manage Authorization
+
+The Auth Manager class enables you to perform authorization checks using the `authorize` method. It takes an authorization request object with the following properties:
+
+* `role` (string, optional if `construct` is true): The name of the role to check authorization against.
+* `actions` (string\[]): An array of actions to check authorization for.
+* `resources` (string | string\[]): The name or an array of names of the resources to check authorization against.
+* `strict` (boolean, optional): If set to `true`, strict mode is enabled, meaning all resources must be authorized. Defaults to `false`.
+* `construct` (boolean, optional if `role` is not null): If is set to true the role will be constructed on the fly from the provided data which is the json string or a plain javascript object of the role.
+* `data` (string | object, optional if `role` is not null): The data to construct the role from.
+
+**Example Usage:**
+
+```typescript
+const isAdminAuthorized = auth.authorize({
+  role: 'admin',
+  actions: ['ban', 'create'],
+  resources: 'user'
+}); // true
+
+const isUserAuthorized = auth.authorize({
+  role: 'user',
+  actions: ['read', 'create'],
+  resources: ['post', 'user'],
+  strict: true
+}); // false
+```
+
+In the example above, the `isAdminAuthorized` variable checks if the `admin` role has authorization to perform the actions 'ban' and 'create' on the 'user' resource. The `isUserAuthorized` variable checks if the `user` role has authorization to perform the actions 'read' and 'create' on both the 'post' and 'user' resources in strict mode.
+
+By using the Auth Manager, you can effectively manage authorization and perform fine-grained access control based on the defined roles and their permissions.

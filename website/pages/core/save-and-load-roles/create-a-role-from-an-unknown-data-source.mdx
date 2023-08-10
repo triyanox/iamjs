@@ -1,0 +1,26 @@
+# Create a role from an unknown data source
+
+This method can be used when you want to create a role from an unknown data source
+
+```typescript
+import crypto from 'crypto';
+
+const key = 'somekey';
+const iv = 'someiv';
+const algorithm = 'aes-256-cbc';
+const key_buffer = Buffer.from(key);
+const iv_buffer = Buffer.from(iv);
+
+const encrypted_role_json_str = 'some encrypted data';
+
+const decrypt = (data: string) => {
+   const decipher = crypto.createDecipheriv(algorithm, key_buffer, iv_buffer);
+   let decrypted = decipher.update(data, 'hex', 'utf8');
+   decrypted += decipher.final('utf8');
+   return decrypted;
+};
+const role = Role.from(encrypted_role_json_str, (data) => {
+   const decrypted = decrypt(data); // decrypt the data
+   return Role.fromJSON(decrypted).toObject(); // convert the decrypted data to a role object and return it
+});
+```

@@ -1,0 +1,49 @@
+# Convert a role to a json string
+
+The `toJSON` method converts the role instance to a JSON string representation. It returns a JSON string that represents the same data as the role instance.
+
+```typescript
+const role = new Role({
+    name: 'role',
+    config: {
+        user: {
+            base: 'crudl',
+            custom: {
+                ban: false
+            }
+        },
+        post: {
+            base: '-rudl',
+            custom: {
+                publish: true
+            }
+        }
+    }
+});
+
+const string = role.toJSON();
+
+// or you can use transform function to shape the output 
+// for example you can encrypt the json string
+const key = crypto.randomBytes(32);
+const iv = crypto.randomBytes(16);
+const algorithm = 'aes-256-cbc';
+
+const encrypt = (data: string) => {
+  const cipher = crypto.createCipheriv(algorithm, Buffer.from(key), iv);
+  let encrypted = cipher.update(data);
+  encrypted = Buffer.concat([encrypted, cipher.final()]);
+  return { iv: iv.toString('hex'), encryptedData: encrypted.toString('hex') };
+};
+
+const decrypt = (data: { iv: string; encryptedData: string }) => {
+  const iv = Buffer.from(data.iv, 'hex');
+  const encryptedText = Buffer.from(data.encryptedData, 'hex');
+  const decipher = crypto.createDecipheriv(algorithm, Buffer.from(key), iv);
+  let decrypted = decipher.update(encryptedText);
+  decrypted = Buffer.concat([decrypted, decipher.final()]);
+  return decrypted.toString();
+};
+
+const encrypted = role.toJSON((data) => encrypt(data).encryptedData);
+```

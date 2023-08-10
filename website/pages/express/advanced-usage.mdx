@@ -1,0 +1,66 @@
+# Advanced Usage
+
+```ts
+import { Role, Schema } from '@iamjs/core';
+import { ExpressRoleManager } from '@iamjs/express';
+import express from 'express';
+
+const role = new Role({
+  name: 'role',
+  config: {
+    resource1: {
+      base: 'crudl'
+    },
+    resource2: {
+      base: 'cr-dl',
+      custom: {
+        'create a new user': false
+      }
+    }
+  }
+});
+
+const schema = new Schema({
+  roles : { role }
+});
+
+const roleManager = new ExpressRoleManager({
+  schema: schema,
+  onError(_err, _req, res, _next) {
+    res.status(403).send('Forbidden');
+  },
+  onSucess(_req, res, _next) {
+    res.status(200).send('Hello World from the success handler!');
+  }
+});
+
+const app = express();
+
+const auth = async (req, res, next) => {
+  req.permissions = role.toObject();
+  next();
+};
+
+app.get(
+  '/resource1',
+  auth,
+  roleManager.check({
+    resources: 'resource1',
+    actions: ['create', 'rupdate'],
+    strict: true,
+    construct: true,
+    // get the role json or object from the request
+    data: async (req) => {
+      return req.permissions
+    }
+  }),
+  (_req, res) => {
+    res.send('Hello World!');
+  }
+);
+
+
+app.listen(3000, () => {
+  console.log('Example app listening at http://localhost:3000');
+});
+```
