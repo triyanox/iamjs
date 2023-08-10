@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/react",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "This package contains React components that can be used to easily integrate the authorization library into a React application.",
   "repository": "https://github.com/triyanox/iamjs",
   "keywords": [
@@ -66,7 +66,7 @@
   },
   "gitHead": "25eac252720288b823c4847328c9ac66efda0f4d",
   "dependencies": {
-    "@iamjs/core": "^1.0.3"
+    "@iamjs/core": "^2.0.0"
   },
   "peerDependencies": {
     "react": "^18.2.0",
