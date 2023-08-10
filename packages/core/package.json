@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/core",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "This package contains the core logic and interfaces for the authorization library.",
   "repository": "https://github.com/triyanox/iamjs",
   "keywords": [
@@ -48,5 +48,5 @@
     "vite": "^4.2.1",
     "vite-plugin-dts": "^2.2.0"
   },
-  "gitHead": "25eac252720288b823c4847328c9ac66efda0f4d"
+  "gitHead": "96274fdff776881bc0b76a4aef10e5476c2c570d"
 }
