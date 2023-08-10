@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/next",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "This package contains server-side components for integrating the authorization library into a Next.js application.",
   "repository": "https://github.com/triyanox/iamjs",
   "keywords": [
@@ -55,6 +55,6 @@
   },
   "gitHead": "25eac252720288b823c4847328c9ac66efda0f4d",
   "dependencies": {
-    "@iamjs/core": "^2.0.0"
+    "@iamjs/core": "^2.0.1"
   }
 }
