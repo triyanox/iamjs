@@ -16,6 +16,7 @@
   "homepage": "https://github.com/triyanox/iamjs-docs",
   "dependencies": {
     "@next/font": "^13.4.13",
+    "@vercel/og": "^0.5.10",
     "next": "^13.4.13",
     "nextra": "latest",
     "nextra-theme-docs": "latest",
