@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/express",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "description": "This package contains middleware for integrating the authorization library into an Express application.",
   "repository": "https://github.com/triyanox/iamjs",
   "keywords": [
