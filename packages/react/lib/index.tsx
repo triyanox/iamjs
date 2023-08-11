@@ -115,3 +115,4 @@ const useAuthorization = <T extends Roles<T>>(schema: Schema<T>): useAuthorizati
 };
 
 export { createSchema, useAuthorization };
+export type { Actions, Resources, TBuildShowProps, TShowProps, useAuthorizationReturnType };

@@ -15,7 +15,7 @@ export default defineConfig({
       entry: path.resolve(__dirname, 'index.ts'),
       name: '@iamjs/react',
       formats: ['es', 'umd'],
-      fileName: (format) => `index.${format}.js`
+      fileName: (format) => `index.${format}.js`,
     },
     rollupOptions: {
       external: ['react', 'react-dom'],
@@ -24,7 +24,7 @@ export default defineConfig({
           react: 'React',
           'react-dom': 'ReactDOM'
         }
-      }
+      },
     }
   }
 });
