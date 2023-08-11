@@ -52,7 +52,7 @@ const useAuthorization = <T extends Roles<T>>(schema: Schema<T>): useAuthorizati
     }
 
     function can(resources: Resources<T>, actions: Actions<T>, strict = false) {
-      if (!role?.toObject() || typeof role.toObject() !== 'function') {
+      if (typeof role?.toObject() !== 'function') {
         return false;
       }
       return authManager.authorize({
@@ -69,7 +69,7 @@ const useAuthorization = <T extends Roles<T>>(schema: Schema<T>): useAuthorizati
       actions,
       strict = false
     }: TBuildShowProps<T>): JSX.Element | null => {
-      if (!role?.toObject() || typeof role.toObject() !== 'function') {
+      if (typeof role?.toObject() !== 'function') {
         return null;
       }
       const can = authManager.authorize({
