@@ -42,60 +42,97 @@ class KoaRoleManager<T extends Roles<T>> extends AuthManager<T> implements IKoaR
     return options as TAutorizeOptions<T>;
   }
 
+  private async _handleSuccess(ctx: Context, next: Next, options: TKoaCheckOptions<T>) {
+    if (this.onActivity) {
+      await this.onActivity({
+        actions: options.actions,
+        ctx,
+        resources: options.resources,
+        role: this._role(options),
+        success: true
+      });
+    }
+
+    if (this.onSuccess) {
+      this.onSuccess(ctx, next);
+    } else {
+      await next();
+    }
+  }
+
+  private async _handleError(
+    ctx: Context,
+    next: Next,
+    error: AuthError,
+    options: TKoaCheckOptions<T>
+  ) {
+    if (this.onActivity) {
+      await this.onActivity({
+        actions: options.actions,
+        ctx,
+        resources: options.resources,
+        role: this._role(options),
+        success: false
+      });
+    }
+
+    if (this.onError) {
+      this.onError(error, ctx, next);
+    } else {
+      throw error;
+    }
+  }
+
+  /**
+   * The method can be used as a middleware to check if the user is authorized to access the route
+   */
   public check(options: TKoaCheckOptions<T>): (ctx: Context, next: Next) => Promise<void> {
     return async (ctx: Context, next: Next) => {
       const o = await this._resolveOptions(ctx, options);
       const authorized = this.authorize(o);
+
       try {
         if (authorized) {
-          if (this.onActivity) {
-            this.onActivity({
-              actions: options.actions,
-              ctx,
-              resources: options.resources,
-              role: this._role(options),
-              success: true
-            }).then(() => {
-              if (this.onSuccess) {
-                this.onSuccess(ctx, next);
-              } else {
-                next();
-              }
-            });
-            return;
-          }
-          if (this.onSuccess) {
-            this.onSuccess(ctx, next);
-          } else {
-            next();
-          }
+          await this._handleSuccess(ctx, next, options);
         } else {
           throw AuthError.throw_error('UNAUTHORIZED');
         }
       } catch (error: any) {
-        if (this.onActivity) {
-          this.onActivity({
-            actions: options.actions,
-            ctx,
-            resources: options.resources,
-            role: this._role(options),
-            success: false
-          }).then(() => {
-            if (this.onError) {
-              this.onError(error, ctx, next);
-            } else {
-              throw error;
-            }
-          });
-          return;
-        }
-        if (this.onError) {
-          this.onError(error, ctx, next);
-        } else {
-          throw error;
-        }
+        await this._handleError(ctx, next, error, options);
       }
     };
+  }
+
+  /**
+   * The method returns a boolean value to check if the user is authorized to access the route
+   */
+  public async checkFn(options: TAutorizeOptions<T>): Promise<boolean> {
+    const authorized = await new Promise<boolean>((resolve) => {
+      const authorized = this.authorize(options);
+      if (authorized) {
+        resolve(true);
+      }
+      resolve(false);
+    });
+
+    if (authorized) {
+      if (this.onActivity) {
+        await this.onActivity({
+          actions: options.actions,
+          resources: options.resources,
+          success: true
+        });
+      }
+      return true;
+    }
+    if (this.onActivity) {
+      await this.onActivity({
+        actions: options.actions,
+        resources: options.resources,
+        success: false
+      });
+    }
+    return false;
   }
 }
 

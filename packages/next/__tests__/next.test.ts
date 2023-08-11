@@ -53,3 +53,26 @@ describe('NextRoleManager', () => {
     expect(res.text).toBe('Hello World!');
   });
 });
+
+describe('Test checkFn method', () => {
+  it('should return true when role is authorized', async () => {
+    const authorized = await roleManager.checkFn({
+      resources: 'resource1',
+      actions: ['create', 'update'],
+      role: 'role'
+    });
+
+    expect(authorized).toBe(true);
+  });
+
+  it('should return false when role is not authorized', async () => {
+    const authorized = await roleManager.checkFn({
+      resources: 'resource2',
+      actions: ['create', 'update'],
+      role: 'role',
+      strict: true
+    });
+
+    expect(authorized).toBe(false);
+  });
+});

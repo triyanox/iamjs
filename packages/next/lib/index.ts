@@ -52,6 +52,56 @@ class NextRoleManager<T extends Roles<T>> extends AuthManager<T> implements INex
     return options as TAutorizeOptions<T>;
   }
 
+  private async _handleSuccess<R extends NextApiRequest, U extends NextApiResponse>(
+    handler: (req: R, res: U) => void,
+    req: R,
+    res: U,
+    options: TNextCheckOptions<T>
+  ) {
+    if (this.onActivity) {
+      await this.onActivity<R>({
+        actions: options.actions,
+        req,
+        resources: options.resources,
+        role: this._role(options),
+        success: true
+      });
+    }
+
+    if (this.onSucess) {
+      this.onSucess<R, U>(req, res);
+    } else {
+      handler(req, res);
+    }
+  }
+
+  private async _handleError<R extends NextApiRequest, U extends NextApiResponse>(
+    _handler: (req: R, res: U) => void,
+    req: R,
+    res: U,
+    error: AuthError,
+    options: TNextCheckOptions<T>
+  ) {
+    if (this.onActivity) {
+      await this.onActivity<R>({
+        actions: options.actions,
+        req,
+        resources: options.resources,
+        role: this._role(options),
+        success: false
+      });
+    }
+
+    if (this.onError) {
+      this.onError<R, U>(error, req, res);
+    } else {
+      throw error;
+    }
+  }
+
+  /**
+   * The method can be used as a middleware to check if the user is authorized to access the route
+   */
   public check<R extends NextApiRequest, U extends NextApiResponse>(
     handler: (req: R, res: U) => void,
     options: TNextCheckOptions<T>
@@ -59,56 +109,49 @@ class NextRoleManager<T extends Roles<T>> extends AuthManager<T> implements INex
     return async (req: R, res: U) => {
       const o = await this._resolveOptions(req, options);
       const authorized = this.authorize(o);
+
       try {
         if (authorized) {
-          if (this.onActivity) {
-            this.onActivity<R>({
-              actions: options.actions,
-              req,
-              resources: options.resources,
-              role: this._role(options),
-              success: true
-            }).then(() => {
-              if (this.onSucess) {
-                this.onSucess<R, U>(req, res);
-              } else {
-                handler(req, res);
-              }
-            });
-            return;
-          }
-          if (this.onSucess) {
-            this.onSucess<R, U>(req, res);
-          } else {
-            handler(req, res);
-          }
+          await this._handleSuccess(handler, req, res, options);
         } else {
           throw AuthError.throw_error('UNAUTHORIZED');
         }
       } catch (error: any) {
-        if (this.onActivity) {
-          this.onActivity<R>({
-            actions: options.actions,
-            req,
-            resources: options.resources,
-            role: this._role(options),
-            success: false
-          }).then(() => {
-            if (this.onError) {
-              this.onError<R, U>(error, req, res);
-            } else {
-              throw error;
-            }
-          });
-          return;
-        }
-        if (this.onError) {
-          this.onError<R, U>(error, req, res);
-        } else {
-          throw error;
-        }
+        await this._handleError(handler, req, res, error, options);
       }
     };
+  }
+
+  /**
+   * The method returns a boolean value to check if the user is authorized to access the route
+   */
+  public async checkFn(options: TAutorizeOptions<T>): Promise<boolean> {
+    const authorized = await new Promise<boolean>((resolve) => {
+      const authorized = this.authorize(options);
+      if (authorized) {
+        resolve(true);
+      }
+      resolve(false);
+    });
+
+    if (authorized) {
+      if (this.onActivity) {
+        await this.onActivity({
+          actions: options.actions,
+          resources: options.resources,
+          success: true
+        });
+      }
+      return true;
+    }
+    if (this.onActivity) {
+      await this.onActivity({
+        actions: options.actions,
+        resources: options.resources,
+        success: false
+      });
+    }
+    return false;
   }
 }
 

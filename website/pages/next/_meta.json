@@ -4,5 +4,6 @@
   "advanced-usage": "Advanced Usage",
   "success-and-error-handling": "Success and Error Handling",
   "save-users-activity": "Save Users Activity",
-  "typescript-support": "Typescript Support"
+  "typescript-support": "Typescript Support",
+  "app-api-routes": "App Router Api Routes"
 }

@@ -107,3 +107,4 @@ app.use(router.routes());
 const server = request.agent(app.callback());
 
 export default server;
+export { roleManager };

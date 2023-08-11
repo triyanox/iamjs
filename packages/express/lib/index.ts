@@ -57,6 +57,56 @@ class ExpressRoleManager<T extends Roles<T>>
     return options as TAutorizeOptions<T>;
   }
 
+  private async _handleSuccess<R extends Request, U extends Response>(
+    req: R,
+    res: U,
+    next: NextFunction,
+    options: TExpressCheckOptions<T>
+  ) {
+    if (this.onActivity) {
+      await this.onActivity<R>({
+        actions: options.actions,
+        req,
+        resources: options.resources,
+        role: this._role(options),
+        success: true
+      });
+    }
+
+    if (this.onSucess) {
+      this.onSucess<R, U>(req, res, next);
+    } else {
+      next();
+    }
+  }
+
+  private async _handleError<R extends Request, U extends Response>(
+    req: R,
+    res: U,
+    next: NextFunction,
+    error: AuthError,
+    options: TExpressCheckOptions<T>
+  ) {
+    if (this.onActivity) {
+      await this.onActivity<R>({
+        actions: options.actions,
+        req,
+        resources: options.resources,
+        role: this._role(options),
+        success: false
+      });
+    }
+
+    if (this.onError) {
+      this.onError<R, U>(error, req, res, next);
+    } else {
+      next(error);
+    }
+  }
+
+  /**
+   * The method can be used as a middleware to check if the user is authorized to access the route
+   */
   public check<R extends Request, U extends Response>(
     options: TExpressCheckOptions<T>
   ): (req: R, res: U, next: NextFunction) => void {
@@ -65,54 +115,46 @@ class ExpressRoleManager<T extends Roles<T>>
       const authorized = this.authorize(o);
       try {
         if (authorized) {
-          if (this.onActivity) {
-            this.onActivity<R>({
-              actions: options.actions,
-              req,
-              resources: options.resources,
-              role: this._role(options),
-              success: true
-            }).then(() => {
-              if (this.onSucess) {
-                this.onSucess<R, U>(req, res, next);
-              } else {
-                next();
-              }
-            });
-            return;
-          }
-          if (this.onSucess) {
-            this.onSucess<R, U>(req, res, next);
-          } else {
-            next();
-          }
+          await this._handleSuccess(req, res, next, options);
         } else {
           throw AuthError.throw_error('UNAUTHORIZED');
         }
       } catch (error: any) {
-        if (this.onActivity) {
-          this.onActivity<R>({
-            actions: options.actions,
-            req,
-            resources: options.resources,
-            role: this._role(options),
-            success: false
-          }).then(() => {
-            if (this.onError) {
-              this.onError<R, U>(error, req, res, next);
-            } else {
-              next(error);
-            }
-          });
-          return;
-        }
-        if (this.onError) {
-          this.onError<R, U>(error, req, res, next);
-        } else {
-          next(error);
-        }
+        await this._handleError(req, res, next, error, options);
       }
     };
+  }
+
+  /**
+   * The method returns a boolean value to check if the user is authorized to access the route
+   */
+  public async checkFn(options: TAutorizeOptions<T>): Promise<boolean> {
+    const authorized = await new Promise<boolean>((resolve) => {
+      const authorized = this.authorize(options);
+      if (authorized) {
+        resolve(true);
+      }
+      resolve(false);
+    });
+
+    if (authorized) {
+      if (this.onActivity) {
+        await this.onActivity({
+          actions: options.actions,
+          resources: options.resources,
+          success: true
+        });
+      }
+      return true;
+    }
+    if (this.onActivity) {
+      await this.onActivity({
+        actions: options.actions,
+        resources: options.resources,
+        success: false
+      });
+    }
+    return false;
   }
 }
 

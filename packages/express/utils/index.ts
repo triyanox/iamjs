@@ -103,3 +103,4 @@ app.get(
 const server = request(app);
 
 export default server;
+export { roleManager };
