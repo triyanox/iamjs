@@ -7,7 +7,7 @@ export default defineConfig({
   plugins: [
     react(),
     dts({
-      insertTypesEntry: true
+      outputDir: 'dist'
     })
   ],
   build: {
@@ -15,7 +15,12 @@ export default defineConfig({
       entry: path.resolve(__dirname, 'index.ts'),
       name: '@iamjs/react',
       formats: ['es', 'umd'],
-      fileName: (format) => `index.${format}.js`,
+      fileName: (format) => {
+        if (format === 'umd') {
+          return 'index.umd.js';
+        }
+        return 'index.js';
+      },
     },
     rollupOptions: {
       external: ['react', 'react-dom'],

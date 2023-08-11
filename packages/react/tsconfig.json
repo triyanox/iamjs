@@ -3,7 +3,10 @@
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
     "jsx": "react-jsx",
     "module": "ESNext",
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "declaration": true,
+    "sourceMap": true,
+    "outDir": "dist"
   },
   "extends": "../../tsconfig.json",
   "include": ["**/*.ts", "**/*.tsx"],
