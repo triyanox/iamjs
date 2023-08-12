@@ -1,4 +1,4 @@
-# Example app with iamjs
+# Example app with next.js
 
 This an example to showcase how to implement access control in a Next.js app using [iamjs](https://github.com/triyanox/iamjs).
 
