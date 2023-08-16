@@ -11,12 +11,12 @@ title="iamjs" align="center" height="auto" width="100%"/>
 
 You can install `iamjs` using one of the following packages:
   
-- [`@iamjs/express` 🚀](packages/express/README.md) - for express middleware
-- [`@iamjs/koa` 🐱‍🏍](packages/koa/README.md) - for koa middleware
-- [`@iamjs/next` ⏭](packages/next/README.md) - for next.js middleware
-- [`@iamjs/react` ⚛️](packages/react/README.md) - for react component
+- [`@iamjs/express` 🚀](https://iamjs.achaq.dev/express) - for express middleware
+- [`@iamjs/koa` 🐱‍🏍](https://iamjs.achaq.dev/koa) - for koa middleware
+- [`@iamjs/next` ⏭](https://iamjs.achaq.dev/next) - for next.js middleware
+- [`@iamjs/react` ⚛️](https://iamjs.achaq.dev/react) - for react component
 
-Alternatively, you can use the `@iamjs/core` 🧠 package, which contains all the necessary logic and can be used with any framework.
+Alternatively, you can use the [`@iamjs/core` 🧠](https://iamjs.achaq.dev/core) package, which contains all the necessary logic and can be used with any framework.
 
 ## Documentation
 
