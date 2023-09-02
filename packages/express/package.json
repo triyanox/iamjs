@@ -18,7 +18,9 @@
     "attribute based access control",
     "access control library",
     "express",
-    "express middleware"
+    "express middleware",
+    "typesafety",
+    "typescript"
   ],
   "author": "Mohamed Achaq <hi@achaq.dev>",
   "homepage": "https://iamjs.achaq.dev",

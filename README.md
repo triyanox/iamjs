@@ -1,11 +1,11 @@
 <img src="https://raw.githubusercontent.com/triyanox/iamjs/main/assets/logo.png" alt="iamjs logo" title="iamjs" align="right" height="50" width="50"/>
 
-# **iamjs** - Your complete Access Control Library
+# **iamjs** - Your complete Access Control Library with End-to-end typesafety
 
 <img src="https://raw.githubusercontent.com/triyanox/iamjs/main/assets/banner.png" alt="iamjs banner"
 title="iamjs" align="center" height="auto" width="100%"/>
 
-`iamjs` is a fully-featured library that makes authorization easy. It is designed to be used in both Node.js and browser environments, and currently supports popular frameworks like express, koa, next.js, and react.
+`iamjs` is a fully-featured and typesafe library that makes authorization easy. It is designed to be used in both Node.js and browser environments, and currently supports popular frameworks like express, koa, next.js, and react.
 
 ## Installation
 
@@ -21,7 +21,6 @@ Alternatively, you can use the [`@iamjs/core` 🧠](https://iamjs.achaq.dev/core
 ## Documentation
 
 > You can check the full documentation [here](https://iamjs.achaq.dev/) learn more about the capabilities of `iamjs` and how to use it in you next project.
-
 
 
 ## Usage

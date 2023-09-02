@@ -18,7 +18,9 @@
     "attribute based access control",
     "access control library",
     "react",
-    "reactjs"
+    "reactjs",
+    "typesafety",
+    "typescript"
   ],
   "author": "Mohamed Achaq <hi@achaq.dev>",
   "homepage": "https://iamjs.achaq.dev",

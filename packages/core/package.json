@@ -1,7 +1,7 @@
 {
   "name": "@iamjs/core",
   "version": "2.0.7",
-  "description": "This package contains the core logic and interfaces for the authorization library.",
+  "description": "This package contains the core logic and interfaces for the authorization library with End-to-end typesafety",
   "repository": "https://github.com/triyanox/iamjs",
   "keywords": [
     "iamjs",
@@ -16,7 +16,9 @@
     "role based access control",
     "attribute",
     "attribute based access control",
-    "access control library"
+    "access control library",
+    "typesafety",
+    "typescript"
   ],
   "author": "Mohamed Achaq <hi@achaq.dev>",
   "homepage": "https://iamjs.achaq.dev",
