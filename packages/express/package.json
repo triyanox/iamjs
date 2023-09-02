@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/express",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "This package contains middleware for integrating the authorization library into an Express application.",
   "repository": "https://github.com/triyanox/iamjs",
   "keywords": [
@@ -57,7 +57,7 @@
     "vite-plugin-dts": "^3.5.2"
   },
   "dependencies": {
-    "@iamjs/core": "^2.0.7"
+    "@iamjs/core": "^2.0.8"
   },
   "gitHead": "5a476c6642eb18fb9dd51150bb8a7ae5da4df093"
 }
