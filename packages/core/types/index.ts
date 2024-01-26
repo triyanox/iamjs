@@ -344,11 +344,17 @@ interface ISchema<T extends Roles<T>> {
    */
   toJSON<K extends keyof T>(role: K): string;
   toJSON<K extends keyof T, R>(role: K, transform: (data: string) => R): R;
+  toJSON<K extends keyof T, R>(role: K, transform?: (data: string) => R): string | R;
+
   /**
    * Convert a role into an object, optionally transform the result
    */
   toObject<K extends keyof T>(role: K): GetRoleConfig<T[K]>;
   toObject<K extends keyof T, R>(role: K, transform: (data: GetRoleConfig<T[K]>) => R): R;
+  toObject<K extends keyof T, R>(
+    role: K,
+    transform?: (data: GetRoleConfig<T[K]>) => R
+  ): GetRoleConfig<T[K]> | R;
   /**
    * Check if a role exists in the schema
    */

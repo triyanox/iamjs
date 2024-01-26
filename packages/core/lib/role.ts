@@ -306,7 +306,7 @@ class Role<T extends TRoleOptions> implements IRole<T> {
     transform: (data: D) => GetRoleConfig<T>
   ): Role<GetRoleConfig<T>> {
     const role = transform(data);
-    return new Role(role as unknown as GetRoleConfig<T>);
+    return new Role(role as unknown as GetRoleConfig<T>) as Role<GetRoleConfig<T>>;
   }
 
   /**
