@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/koa",
-  "version": "2.0.11",
+  "version": "2.0.12",
   "description": "This package contains middleware for integrating the authorization library into a Koa application. ",
   "repository": "https://github.com/triyanox/iamjs",
   "keywords": [
@@ -60,6 +60,6 @@
   },
   "gitHead": "5a476c6642eb18fb9dd51150bb8a7ae5da4df093",
   "dependencies": {
-    "@iamjs/core": "^2.0.10"
+    "@iamjs/core": "^2.0.11"
   }
 }
