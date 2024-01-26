@@ -11,7 +11,6 @@ export type {
   IAuthManager,
   IPermission,
   IRole,
-  ISchema,
   InferPermissions,
   InferResources,
   IntersectionToUnion,

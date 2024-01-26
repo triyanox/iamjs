@@ -1,4 +1,4 @@
-import { Role } from '../lib';
+import { Role, Schema } from '../lib';
 import { ConcatStrings, IntersectionToUnion, MergeObjects } from './utils.types';
 
 /**
@@ -326,42 +326,6 @@ type Actions<T extends Roles<T>> =
   | (string & {})
   | (string & {})[];
 
-interface ISchema<T extends Roles<T>> {
-  roles: {
-    [K in keyof T]: T[K] extends Role<infer U> ? Role<U> : never;
-  };
-  /**
-   * Returns the role with the given name
-   * @param name
-   */
-  getRole<K extends keyof T>(name: K): T[K];
-  /**
-   * Returns all resources in the schema
-   */
-  getResources(): Record<keyof MergePermissions<T>, keyof MergePermissions<T>>;
-  /**
-   * Get all resources in the schema
-   */
-  toJSON<K extends keyof T>(role: K): string;
-  toJSON<K extends keyof T, R>(role: K, transform: (data: string) => R): R;
-  toJSON<K extends keyof T, R>(role: K, transform?: (data: string) => R): string | R;
-
-  /**
-   * Convert a role into an object, optionally transform the result
-   */
-  toObject<K extends keyof T>(role: K): GetRoleConfig<T[K]>;
-  toObject<K extends keyof T, R>(role: K, transform: (data: GetRoleConfig<T[K]>) => R): R;
-  toObject<K extends keyof T, R>(
-    role: K,
-    transform?: (data: GetRoleConfig<T[K]>) => R
-  ): GetRoleConfig<T[K]> | R;
-  /**
-   * Check if a role exists in the schema
-   */
-  // eslint-disable-next-line @typescript-eslint/ban-types
-  exists(role: keyof T | (string & {})): boolean;
-}
-
 /**
  * The options for the `Schema` class
  */
@@ -378,7 +342,7 @@ interface IAuthManager<T extends Roles<T>> {
   /**
    * `AuthManager` schema
    */
-  schema: ISchema<T>;
+  schema: Schema<T>;
   /**
    * This method is used to check the permissions of a role on a resource
    */
@@ -462,7 +426,6 @@ export type {
   IAuthManager,
   IPermission,
   IRole,
-  ISchema,
   InferPermissions,
   InferResources,
   IntersectionToUnion,

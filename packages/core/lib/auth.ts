@@ -1,6 +1,5 @@
 import {
   IAuthManager,
-  ISchema,
   Roles,
   TAuthPermissions,
   TAuthResources,
@@ -10,12 +9,13 @@ import {
 } from '../types';
 import utils from '../utils';
 import Role from './role';
+import Schema from './schema';
 
 /**
  * The `AuthManager` class
  */
 class AuthManager<T extends Roles<T>> implements IAuthManager<T> {
-  constructor(public schema: ISchema<T>) {}
+  constructor(public schema: Schema<T>) {}
 
   private _verifyPermissionsLoose<U extends TRoleOptions>(
     role: Role<U>,

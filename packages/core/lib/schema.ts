@@ -1,4 +1,4 @@
-import { GetRoleConfig, ISchema, MergePermissions, TSchemaOptions } from '../types';
+import { GetRoleConfig, MergePermissions, TSchemaOptions } from '../types';
 import Role from './role';
 
 /**
@@ -8,8 +8,7 @@ class Schema<
   T extends {
     [K in keyof T]: T[K] extends Role<infer U> ? Role<U> : never;
   }
-> implements ISchema<T>
-{
+> {
   constructor(public options: TSchemaOptions<T>) {}
 
   /**
