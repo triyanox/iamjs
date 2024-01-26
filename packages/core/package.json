@@ -1,6 +1,6 @@
 {
   "name": "@iamjs/core",
-  "version": "2.0.12",
+  "version": "2.0.13",
   "description": "This package contains the core logic and interfaces for the authorization library with End-to-end typesafety",
   "repository": "https://github.com/triyanox/iamjs",
   "keywords": [
