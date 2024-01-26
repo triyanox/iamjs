@@ -1,4 +1,4 @@
-import { Role, Schema } from '../lib';
+import { Role } from '../lib';
 import { ConcatStrings, IntersectionToUnion, MergeObjects } from './utils.types';
 
 /**
@@ -326,15 +326,19 @@ type Actions<T extends Roles<T>> =
   | (string & {})
   | (string & {})[];
 
-interface ISchema<
-  T extends {
+interface ISchema<T extends Roles<T>> {
+  roles: {
     [K in keyof T]: T[K] extends Role<infer U> ? Role<U> : never;
-  }
-> {
+  };
   /**
-   * Get roles
+   * Returns the role with the given name
+   * @param name
    */
   getRole<K extends keyof T>(name: K): T[K];
+  /**
+   * Returns all resources in the schema
+   */
+  getResources(): Record<keyof MergePermissions<T>, keyof MergePermissions<T>>;
   /**
    * Get all resources in the schema
    */
