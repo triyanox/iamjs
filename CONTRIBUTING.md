@@ -1,29 +1,108 @@
-# Contributing
+# Contributing to iamjs
 
-👍🏼🎉 Thanks for considering contributing to this project!
+👍🎉 Thank you for your interest in contributing to iamjs! We welcome contributions from developers of all skill levels and backgrounds. This guide will help you get started with the contribution process.
 
-If you are not sure where to start, take a look at the Issues page to see if there is something that interests you.
+## Table of Contents
+1. [Code of Conduct](#code-of-conduct)
+2. [Getting Started](#getting-started)
+3. [Contribution Process](#contribution-process)
+4. [Development Guidelines](#development-guidelines)
+5. [Submitting a Pull Request](#submitting-a-pull-request)
+6. [Code Review Process](#code-review-process)
+7. [Community and Support](#community-and-support)
 
-Remember to always create a new branch when making changes to avoid any conflicts with the main branch. And don't forget to write meaningful commit messages to make it easier for reviewers to understand your changes.
+## Code of Conduct
 
-We appreciate all contributions, big or small. Let's make this project even better together!
+Before contributing, please read and adhere to our [Code of Conduct](CODE_OF_CONDUCT.md). We are committed to providing a welcoming and inclusive environment for all contributors.
 
-Sure, I can add some detailed steps for each of the contribution process. Here they are:
+## Getting Started
 
-Fork the repository: Click on the "Fork" button in the top right corner of the repository page to create a copy of the project to your own GitHub account.
+If you're new to the project, here are some ways to get started:
 
-Clone your forked repository: Copy the URL of your forked repository and run `git clone https://github.com/triyanox/iamjs` command in your terminal to clone it to your local machine.
+1. **Explore the Issues**: Check out our [Issues](https://github.com/triyanox/iamjs/issues) page to find tasks that interest you. Issues labeled "good first issue" are great for newcomers.
+2. **Set Up Your Development Environment**: Follow our [Development Setup Guide](DEVELOPMENT_SETUP.md) to get your local environment ready.
+3. **Read the Documentation**: Familiarize yourself with our [project documentation](https://github.com/triyanox/iamjs/docs) to understand the project structure and guidelines.
 
-Create a new branch: Run git checkout -b <new-branch-name> command to create a new branch where you will make your changes.
+## Contribution Process
 
-Make your changes: Now that you have a new branch, you can start making your changes. Remember to follow any guidelines or coding standards specified in the project's documentation.
+Here's a step-by-step guide to contributing to iamjs:
 
-Commit your changes: Once you have made your changes, stage them with git add . command and commit them using git commit -m "Your commit message" command.
+1. **Fork the Repository**: 
+   - Click the "Fork" button in the top right corner of the [iamjs repository](https://github.com/triyanox/iamjs) to create a copy in your GitHub account.
 
-Push your changes to your forked repository: Push your changes to your forked repository using git push origin <new-branch-name> command.
+2. **Clone Your Fork**:
+   ```
+   git clone https://github.com/YOUR_USERNAME/iamjs.git
+   cd iamjs
+   ```
 
-Create a pull request: Go to your forked repository's page on GitHub, switch to the new branch, and click on the "Compare & pull request" button. Write a description for your pull request and click on the "Create pull request" button.
+3. **Set Up Remote**:
+   ```
+   git remote add upstream https://github.com/triyanox/iamjs.git
+   ```
 
-Wait for the review and merge: After creating your pull request, the maintainers of the project will review your changes and provide feedback if necessary. Once your pull request is approved, it will be merged into the main branch of the project.
+4. **Create a New Branch**:
+   ```
+   git checkout -b your-feature-branch
+   ```
+   Use a descriptive name for your branch, e.g., `fix-login-bug` or `add-dark-mode`.
 
-That's it! You have successfully contributed to the project. Don't forget to delete your branch once your changes have been merged.
+5. **Make Your Changes**: 
+   - Implement your feature or fix the bug.
+   - Ensure your code adheres to our [coding standards](#development-guidelines).
+   - Add or update tests as necessary.
+
+6. **Commit Your Changes**:
+   ```
+   git add .
+   git commit -m "Your descriptive commit message"
+   ```
+   Write clear, concise commit messages. See our [commit message guidelines](#commit-message-guidelines) for more details.
+
+7. **Stay Updated**:
+   ```
+   git fetch upstream
+   git rebase upstream/main
+   ```
+
+8. **Push Your Changes**:
+   ```
+   git push origin your-feature-branch
+   ```
+
+## Development Guidelines
+
+- Follow the coding style and conventions used throughout the project.
+- Write clear, self-documenting code with meaningful variable and function names.
+- Include comments for complex logic or non-obvious code sections.
+- Ensure all tests pass before submitting your changes.
+- Add new tests for new functionality or bug fixes.
+
+### Commit Message Guidelines
+
+- Use the present tense ("Add feature" not "Added feature")
+- Use the imperative mood ("Move cursor to..." not "Moves cursor to...")
+- Limit the first line to 72 characters or less
+- Reference issues and pull requests liberally after the first line
+
+## Submitting a Pull Request
+
+1. Go to the [iamjs repository](https://github.com/triyanox/iamjs) on GitHub.
+2. Click the "New pull request" button.
+3. Select your fork and the branch containing your changes.
+4. Fill out the pull request template with all relevant information.
+5. Click "Create pull request".
+
+## Code Review Process
+
+- A maintainer will review your pull request as soon as possible.
+- Address any feedback or requested changes promptly.
+- Once approved, a maintainer will merge your pull request.
+
+## Community and Support
+
+- Join our [community chat](https://discord.gg/iamjs) for real-time discussions.
+- Check out our [FAQ](FAQ.md) for answers to common questions.
+- For additional help, email us at hi@achaq.dev.
+
+Thank you for contributing to iamjs! Your efforts help make this project better for everyone. 🚀
