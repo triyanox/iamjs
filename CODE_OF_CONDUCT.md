@@ -1,4 +1,4 @@
-# Enhanced Contributor Covenant Code of Conduct
+# Contributor Covenant Code of Conduct
 
 ## Our Pledge
 
@@ -84,6 +84,6 @@ We are committed to regularly reviewing and enhancing this Code of Conduct to en
 
 ## Attribution
 
-This Enhanced Code of Conduct builds upon the [Contributor Covenant](https://www.contributor-covenant.org), version 2.0.
+This Code of Conduct builds upon the [Contributor Covenant](https://www.contributor-covenant.org), version 2.0.
 
 For answers to common questions about this code of conduct, see the [FAQ](https://www.contributor-covenant.org/faq). Translations are available [here](https://www.contributor-covenant.org/translations).
