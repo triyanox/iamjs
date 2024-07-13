@@ -1,6 +1,6 @@
-"use client";
-import { Fragment } from "react";
-import { Toaster } from "sonner";
+'use client';
+import { Fragment } from 'react';
+import { Toaster } from 'sonner';
 
 export function Providers({ children }: { children: React.ReactNode }) {
   return (
@@ -9,8 +9,8 @@ export function Providers({ children }: { children: React.ReactNode }) {
         closeButton
         toastOptions={{
           style: {
-            borderRadius: "1rem",
-          },
+            borderRadius: '1rem'
+          }
         }}
         position="bottom-center"
       />

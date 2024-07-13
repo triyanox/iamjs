@@ -1,5 +1,5 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -11,13 +11,11 @@ export default function Home() {
           </h1>
         </div>
         <p className="text-center text-gray-700">
-          Simplify Access Control with iamjs: Your Comprehensive Library for
-          Effortless Authorization in Both Node.js and Browser Environments.
+          Simplify Access Control with iamjs: Your Comprehensive Library for Effortless
+          Authorization in Both Node.js and Browser Environments.
         </p>
       </div>
-      <h3 className="text-xl font-bold text-center text-gray-900 mb-8">
-        Choose your role:
-      </h3>
+      <h3 className="text-xl font-bold text-center text-gray-900 mb-8">Choose your role:</h3>
       <div className="flex h-full flex-col xl:flex-row justify-center items-center w-full gap-4">
         <Link href="/admin">
           <Button size="lg">Login as admin</Button>
@@ -30,9 +28,7 @@ export default function Home() {
         </Link>
       </div>
       <div className="flex flex-col gap-4 mt-16">
-        <h3 className="text-xl font-bold text-center text-gray-900">
-          Read the docs:
-        </h3>
+        <h3 className="text-xl font-bold text-center text-gray-900">Read the docs:</h3>
         <div className="flex h-full justify-center items-center w-full gap-4">
           <Link target="_blank" href="https://iamjs.achaq.dev">
             <Button size="lg">

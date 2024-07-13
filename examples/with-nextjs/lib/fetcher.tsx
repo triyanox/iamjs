@@ -1,4 +1,4 @@
-import useSWR, { SWRConfiguration } from "swr";
+import useSWR, { SWRConfiguration } from 'swr';
 
 const fetcher = (url: string) => fetch(url).then((r) => r.json());
 
@@ -15,8 +15,7 @@ export default function useFetch<Data = any, Error = any>(
   return {
     data,
     error,
-    loading:
-      (isLoading && !error) || (isValidating && !error) || (!data && !error),
-    mutate,
+    loading: (isLoading && !error) || (isValidating && !error) || (!data && !error),
+    mutate
   };
 }

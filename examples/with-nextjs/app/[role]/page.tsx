@@ -1,17 +1,17 @@
-"use client";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Textarea } from "@/components/ui/textarea";
-import { useAuth } from "@/lib/acl";
-import useFetch from "@/lib/fetcher";
-import { useParams, useRouter } from "next/navigation";
-import { useState } from "react";
-import { Else, If, Then } from "react-if";
-import { toast } from "sonner";
+'use client';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Textarea } from '@/components/ui/textarea';
+import { useAuth } from '@/lib/acl';
+import useFetch from '@/lib/fetcher';
+import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Else, If, Then } from 'react-if';
+import { toast } from 'sonner';
 
 const initialText =
-  "Simplify Access Control with iamjs: Your Comprehensive Library for Effortless Authorization in Both Node.js and Browser Environments.";
+  'Simplify Access Control with iamjs: Your Comprehensive Library for Effortless Authorization in Both Node.js and Browser Environments.';
 
 export default function Role() {
   const router = useRouter();
@@ -19,32 +19,32 @@ export default function Role() {
   const { build } = useAuth();
   const [text, setText] = useState<string>(initialText);
 
-  const { loading, data } = useFetch("/api/" + params.role);
+  const { loading, data } = useFetch('/api/' + params.role);
   const { Show, can } = build(data);
 
   const canIUpdate = async () => {
-    const res = await fetch("/api/cani", {
-      method: "PUT",
+    const res = await fetch('/api/cani', {
+      method: 'PUT',
       body: JSON.stringify({
-        role: params.role,
-      }),
+        role: params.role
+      })
     });
     if (res.ok) {
-      toast.success("You can update this post.");
+      toast.success('You can update this post.');
     } else {
       toast.error("You can't update this post.");
     }
   };
 
   const canIDelete = async () => {
-    const res = await fetch("/api/cani", {
-      method: "DELETE",
+    const res = await fetch('/api/cani', {
+      method: 'DELETE',
       body: JSON.stringify({
-        role: params.role,
-      }),
+        role: params.role
+      })
     });
     if (res.ok) {
-      toast.success("You can delete this post.");
+      toast.success('You can delete this post.');
     } else {
       toast.error("You can't delete this post.");
     }
@@ -53,7 +53,7 @@ export default function Role() {
   return (
     <div className="flex flex-col w-full gap-2 justify-center items-center min-h-screen">
       <Button
-        onClick={() => router.push("/")}
+        onClick={() => router.push('/')}
         variant="secondary"
         size="icon"
         className="absolute top-0 left-0 mt-28 mx-56 z-20 flex justify-center items-center rounded-full p-1 h-10 w-10 cursor-pointer"
@@ -90,7 +90,7 @@ export default function Role() {
             <Textarea
               className="w-96 h-36"
               placeholder="Type your message here."
-              disabled={!can("posts", ["create", "update"])}
+              disabled={!can('posts', ['create', 'update'])}
               value={text}
               onChange={(e) => {
                 setText(e.target.value);
@@ -105,9 +105,7 @@ export default function Role() {
               </Show>
             </div>
             <div className="w-96 flex flex-col justify-center items-start gap-2">
-              <p className="text-black/75 text-sm">
-                Check if you can do something
-              </p>
+              <p className="text-black/75 text-sm">Check if you can do something</p>
               <Button className="w-full" onClick={canIUpdate}>
                 Check if you can update
               </Button>

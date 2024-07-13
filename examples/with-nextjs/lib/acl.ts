@@ -1,45 +1,45 @@
-import { Role, Schema } from "@iamjs/core";
-import { NextRoleManager } from "@iamjs/next";
-import { useAuthorization } from "@iamjs/react";
+import { Role, Schema } from '@iamjs/core';
+import { NextRoleManager } from '@iamjs/next';
+import { useAuthorization } from '@iamjs/react';
 
 export const roles = {
   admin: new Role({
-    name: "admin",
-    description: "This role can do anything",
+    name: 'admin',
+    description: 'This role can do anything',
     config: {
       posts: {
-        base: "crudl",
-      },
-    },
+        base: 'crudl'
+      }
+    }
   }),
   editor: new Role({
-    name: "editor",
+    name: 'editor',
     description: "This role can edit posts, can't delete them",
     config: {
       posts: {
-        base: "cru-l",
-      },
-    },
+        base: 'cru-l'
+      }
+    }
   }),
   viewer: new Role({
-    name: "viewer",
-    description: "This role can view posts",
+    name: 'viewer',
+    description: 'This role can view posts',
     config: {
       posts: {
-        base: "-r--l",
-      },
-    },
-  }),
+        base: '-r--l'
+      }
+    }
+  })
 };
 
 export type Roles = keyof typeof roles | (string & {});
 
 export const schema = new Schema({
-  roles,
+  roles
 });
 
 export const acl = new NextRoleManager({
-  schema,
+  schema
 });
 
 export const useAuth = () => {
