@@ -12,9 +12,9 @@
     "registry": "https://registry.npmjs.org/"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^5.58.0",
-    "@typescript-eslint/parser": "^5.58.0",
-    "eslint": "^8.38.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.16.0",
+    "eslint": "^8.56.0",
     "lerna": "^6.6.1",
     "prettier": "^2.8.7",
     "typescript": "^5.0.4"
