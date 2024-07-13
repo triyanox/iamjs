@@ -2,7 +2,7 @@ import { Role, Schema } from '@iamjs/core';
 import { NextRoleManager } from '@iamjs/next';
 import { createServer } from 'http';
 import { NextApiHandler } from 'next';
-import { apiResolver } from 'next/dist/server/api-utils/node';
+import { apiResolver } from 'next/dist/server/api-utils/node/api-resolver';
 import request from 'supertest';
 
 const nextServer = (handler: NextApiHandler) => {

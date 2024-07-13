@@ -1,128 +1,214 @@
 <img src="https://raw.githubusercontent.com/triyanox/iamjs/main/assets/logo.png" alt="iamjs logo" title="iamjs" align="right" height="50" width="50"/>
 
-# **iamjs** - Your complete Access Control Library with End-to-end typesafety
+# iamjs - Your Complete Access Control Library with End-to-End Type Safety
 
 <img src="https://raw.githubusercontent.com/triyanox/iamjs/main/assets/banner.png" alt="iamjs banner"
 title="iamjs" align="center" height="auto" width="100%"/>
 
-`iamjs` is a fully-featured and typesafe library that makes authorization easy. It is designed to be used in both Node.js and browser environments, and currently supports popular frameworks like express, koa, next.js, and react.
+## Table of Contents
+
+- [Overview](#overview)
+- [Key Features](#key-features)
+- [Installation](#installation)
+- [Documentation](#documentation)
+- [Quick Start Guide](#quick-start-guide)
+  - [Creating a Role](#creating-a-role)
+  - [Creating a Schema](#creating-a-schema)
+  - [Using with Express.js](#using-with-expressjs)
+- [Framework Support](#framework-support)
+- [Advanced Usage](#advanced-usage)
+- [Best Practices](#best-practices)
+- [Contributing](#contributing)
+- [License](#license)
+
+## Overview
+
+iamjs is a fully-featured and type-safe library that simplifies authorization in JavaScript and TypeScript applications. Designed for versatility, it supports both Node.js and browser environments, making it an ideal choice for a wide range of projects, from server-side applications to complex front-end systems.
+
+## Key Features
+
+- **End-to-End Type Safety**: Leverage TypeScript for robust type checking across your entire authorization system.
+- **Flexible Role-Based Access Control (RBAC)**: Define granular permissions with ease.
+- **Framework Agnostic**: Core functionality that can be used with any JavaScript framework.
+- **Dedicated Framework Support**: Pre-built integrations for popular frameworks like Express, Koa, Next.js, and React.
+- **Custom Permissions**: Extend beyond basic CRUD operations with custom action definitions.
+- **Activity Logging**: Built-in support for logging authorization activities.
 
 ## Installation
 
-You can install `iamjs` using one of the following packages:
-  
-- [`@iamjs/express` 🚀](https://iamjs.achaq.dev/express) - for express middleware
-- [`@iamjs/koa` 🐱‍🏍](https://iamjs.achaq.dev/koa) - for koa middleware
-- [`@iamjs/next` ⏭](https://iamjs.achaq.dev/next) - for next.js middleware
-- [`@iamjs/react` ⚛️](https://iamjs.achaq.dev/react) - for react component
+iamjs offers multiple packages to suit your specific needs:
 
-Alternatively, you can use the [`@iamjs/core` 🧠](https://iamjs.achaq.dev/core) package, which contains all the necessary logic and can be used with any framework.
+```bash
+# For Express.js applications
+npm install @iamjs/core @iamjs/express
+
+# For Koa applications
+npm install @iamjs/core @iamjs/koa
+
+# For Next.js applications
+npm install @iamjs/core @iamjs/next
+
+# For React applications
+npm install @iamjs/core @iamjs/react
+
+# For framework-agnostic use
+npm install @iamjs/core
+```
 
 ## Documentation
 
-> You can check the full documentation [here](https://iamjs.achaq.dev/) learn more about the capabilities of `iamjs` and how to use it in you next project.
+For comprehensive documentation, including advanced features and API references, visit our [official documentation site](https://iamjs.achaq.dev/).
 
+## Quick Start Guide
 
-## Usage
+### Creating a Role
 
-Let's say you have a simple express app with a single route and you want to add access control to it. First, you need to install the `@iamjs/express` package:
+Define roles with specific permissions using the `Role` class:
 
-```bash
-npm install @iamjs/core @iamjs/express 
-``` 
-Then, you need to create a role use the `Role` class from `@iamjs/core`:
-
-```ts
+```typescript
 import { Role } from '@iamjs/core';
 
-const role = new Role({
-  name: "role",
-  description: "role description",
+const userRole = new Role({
+  name: 'user',
+  description: 'Standard user role',
   meta: {
-    // optional
+    createdAt: new Date(),
+    updatedAt: new Date()
   },
   config: {
-    resource1: {
-      base: "crudl",
-    },
-    resource2: {
-      base: "cr-dl",
+    posts: {
+      base: 'crudl',
       custom: {
-        "create a new user": false,
-      },
+        publish: true,
+        feature: false
+      }
     },
-  },
+    comments: {
+      base: 'crud-'
+    }
+  }
 });
 ```
-This role has a `name` and `description` and `meta` object so you can store any additional information about the role,
-then we have a config object which contains the permissions for each resource. The `base` property is used to define the base permissions for the resource, and the `custom` property is used to define custom permissions for the resource the base permissions are `create`, `read`, `update`, `delete`, and `list`. The `custom` permissions are optional and can be used to define more granular permissions for the resource.
 
-Then you need to create a schema for the role using the `Schema` class from `@iamjs/core`:
+This example creates a 'user' role with permissions for 'posts' and 'comments' resources. The 'base' property uses CRUD notation (create, read, update, delete, list), while 'custom' allows for additional specific actions.
 
-```ts
+### Creating a Schema
+
+Group roles into a schema for easier management:
+
+```typescript
 import { Schema } from '@iamjs/core';
 
 const schema = new Schema({
- roles : { role }
+  roles: { 
+    user: userRole,
+    admin: adminRole // Assuming you've defined an adminRole
+  }
 });
 ```
 
-The shema takes an object with the roles as the value, and the name of the role as the key. You can add as many roles as you want to the schema.
-The schema instance provides a list of useful methods those methods are used by the role manager in that case we are using the express.js role manager form iamjs.
+### Using with Express.js
 
-```ts
-import { ExpressRoleManager } from "@iamjs/express";
+Integrate iamjs into an Express.js application:
 
-const roleManager = new ExpressRoleManager({
-  schema: schema,
-  onError(_err, _req, res, _next) {
-    res.status(403).send("Forbidden");
-  },
-  onSucess(_req, res, _next) {
-    res.status(200).send("Hello World from the success handler!");
-  },
-   async onActivity(data) {
-    console.log(data);
-  },
-});
-```
+```typescript
+import express from 'express';
+import { ExpressRoleManager } from '@iamjs/express';
 
-The role manager takes a schema instance and an `onSuccess` handler called when the request is fullfiled and `onError` when the user is not authorized and `onActivity` is used to save the user's activity. Then you can use a middleware funtion to check if the user is authorized to access the route:
-
-```ts
-import express from "express";
- 
 const app = express();
 
-app.get(
-  "/resource1",
-  roleManager.check({
-    resources: "resource1",
-    actions: ["create", "update"],
-    role: "role",
-    strict: true,
-    // or you can construct the role from permissions
-    construct: true,
-    data: async (req) => {
-      return req.permissions;
-    },
-  }),
-  (_req, res) => {
-    res.send("Hello World!");
+const roleManager = new ExpressRoleManager({
+  schema,
+  onError: (err, req, res, next) => {
+    res.status(403).json({ error: 'Access Denied', details: err.message });
+  },
+  onSuccess: (req, res, next) => {
+    next();
+  },
+  async onActivity(data) {
+    console.log('Authorization activity:', data);
+    // Implement your logging logic here
+  }
+});
+
+// authMiddleware checks if the user has permission to access the specified resources and actions
+const authMiddleware = (resources, actions) => {
+  const role = 'user'; // Assuming the user is authenticated and has the 'user' role
+  return roleManager.check({
+    resources,
+    actions,
+    role,
+    strict: true
+  });
+};
+
+
+app.get('/posts', 
+  authMiddleware('posts', ['read', 'list']),
+  (req, res) => {
+    res.json({ message: 'Posts retrieved successfully' });
   }
 );
- 
-app.listen(3000, () => {
-  console.log("Example app listening at http://localhost:3000");
-});
-``` 
-The check method returns a middleware function that can be used to check if the user is authorized to access the route.
 
+app.listen(3000, () => console.log('Server running on http://localhost:3000'));
+```
+
+This setup checks if a 'user' role has permission to read and list posts before allowing access to the '/posts' route.
+
+## Framework Support
+
+iamjs provides dedicated packages for popular frameworks:
+
+- **Express.js**: `@iamjs/express`
+- **Koa**: `@iamjs/koa`
+- **Next.js**: `@iamjs/next`
+- **React**: `@iamjs/react`
+
+Each package offers framework-specific features while maintaining consistent core functionality.
+
+## Advanced Usage
+
+### Dynamic Role Construction
+
+For scenarios where roles need to be constructed dynamically (e.g., based on database data):
+
+```typescript
+const roleManager = new ExpressRoleManager({
+  schema,
+  // ... other options
+});
+
+app.get('/dynamic-resource',
+  roleManager.check({
+    resources: 'dynamicResource',
+    actions: ['read'],
+    construct: true,
+    data: async (req) => {
+      // Fetch user permissions from database or JWT
+      const userPermissions = await getUserPermissions(req.user.id);
+      return userPermissions;
+    }
+  }),
+  (req, res) => {
+    res.json({ message: 'Access granted to dynamic resource' });
+  }
+);
+```
+
+This approach allows for flexible, user-specific permissions that can be determined at runtime.
+
+## Best Practices
+
+1. **Granular Permissions**: Define permissions at a granular level for fine-tuned access control.
+2. **Use Environment Variables**: Store role configurations in environment variables for easy management across different environments.
+3. **Regular Audits**: Periodically review and update your role definitions to ensure they align with your application's evolving security requirements.
+4. **Implement Logging**: Utilize the `onActivity` handler to maintain an audit trail of authorization decisions.
+5. **Type Safety**: Leverage TypeScript to ensure type safety across your authorization logic.
 
 ## Contributing
 
-Contributions are welcome! Please read the [contributing guide](CONTRIBUTING.md) for more information.
+We welcome contributions to iamjs! Please read our [contributing guide](CONTRIBUTING.md) for details on our code of conduct and the process for submitting pull requests.
 
 ## License
 
-[MIT](https://github.com/triyanox/iamjs/blob/main/LICENSE)
+iamjs is released under the [MIT License](https://github.com/triyanox/iamjs/blob/main/LICENSE).

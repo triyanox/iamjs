@@ -3,9 +3,30 @@
 <img src="https://raw.githubusercontent.com/triyanox/iamjs/main/assets/banner.png" alt="iamjs banner"
 title="iamjs" align="center" height="auto" width="100%"/>
 
-This package contains the react hook for iamjs a library for easy role and permissions management for your application.
+## Overview
+
+The @iamjs/react package provides React hooks and components for integrating the iamjs role-based access control (RBAC) library into React applications. This package simplifies the process of managing permissions and authorizing user actions in your React components.
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Key Features](#key-features)
+- [Usage](#usage)
+  - [Basic Usage](#basic-usage)
+  - [Dynamic Role Building](#dynamic-role-building)
+  - [Conditional Rendering with Show Component](#conditional-rendering-with-show-component)
+- [API Reference](#api-reference)
+  - [createSchema](#createschema)
+  - [useAuthorization](#useauthorization)
+  - [Show Component](#show-component)
+- [Best Practices](#best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
+
+To use @iamjs/react, you need to install both the core library and the React package:
 
 ```bash
 npm install @iamjs/core @iamjs/react
@@ -17,187 +38,231 @@ pnpm add @iamjs/core @iamjs/react
 bun add @iamjs/core @iamjs/react
 ```
 
+## Key Features
+
+- React hooks for easy integration of RBAC in React applications
+- Schema creation for defining roles and permissions
+- Dynamic role building based on user permissions
+- Conditional rendering component based on user permissions
+- TypeScript support for improved type safety
+
 ## Usage
 
-### Basic usage
+### Basic Usage
 
-This example demonstrates the usage of the `@iamjs/core` and `@iamjs/react` packages for role-based authorization.
+Here's a basic example of how to use the @iamjs/react package for authorization in a React component:
 
-1. Import the necessary components and functions from the packages:
-
-```javascript
+```jsx
+import React from 'react';
 import { Role } from '@iamjs/core';
 import { createSchema, useAuthorization } from '@iamjs/react';
-```
 
-2. Create a schema using the `createSchema` function:
-
-```javascript
+// Create a schema with roles and permissions
 const schema = createSchema({
   user: new Role({
     name: 'user',
-    description: 'User role',
-    meta: {
-      name: 'user'
-    },
+    description: 'Standard user role',
     config: {
       books: {
         base: 'crudl',
         custom: {
-          upgrade: true,
-          downgrade: false,
-          sort: true
+          publish: true,
+          unpublish: false
         }
       }
     }
   })
 });
+
+function BookManager() {
+  const { can } = useAuthorization(schema);
+
+  const canCreateBook = can('user', 'books', 'create');
+  const canPublishBook = can('user', 'books', 'publish');
+
+  return (
+    <div>
+      <h1>Book Manager</h1>
+      {canCreateBook && <button>Create New Book</button>}
+      {canPublishBook && <button>Publish Book</button>}
+    </div>
+  );
+}
+
+export default BookManager;
 ```
 
-In this example, the schema is created with a single role named 'user'. The role has a description, meta data, and configuration for the 'books' resource. The 'books' resource has 'crudl' scopes (create, read, update, delete, list), and additional custom permissions such as 'upgrade', 'downgrade', and 'sort'.
+In this example, we define a schema with a 'user' role and its permissions for the 'books' resource. The `useAuthorization` hook is then used to check permissions within the component.
 
-3. Use the `useAuthorization` hook to access the authorization methods:
+### Dynamic Role Building
 
-```javascript
-const { can } = useAuthorization(schema);
-```
+For scenarios where user permissions are fetched from an API, you can dynamically build roles:
 
-The `useAuthorization` hook takes the schema as a parameter and returns an object that includes the `can` method to check permissions.
+```jsx
+import React, { useEffect, useState } from 'react';
+import { Role } from '@iamjs/core';
+import { createSchema, useAuthorization } from '@iamjs/react';
 
-4. Use the `can` method to check if the user has permission:
-
-```javascript
-const canDo = can('user', 'books', 'create').toString(); // 'true'
-```
-
-The `can` method is called with the role name ('user'), the resource name ('books'), and the action ('create'). It returns a boolean value indicating whether the user with the 'user' role has permission to create books.
-
-In summary, this example demonstrates how to create a schema with a role and its permissions using the `@iamjs/core` package. Then, the `@iamjs/react` package is used to access the `useAuthorization` hook and check permissions using the `can` method.&#x20;
-
-### Build a role from its permissions
-
-This example also demonstrates the usage of the build function for permissions based authorization.
-
-```typescript
-import { Role } from "@iamjs/core";
-import { createSchema, useAuthorization } from "@iamjs/react";
-import { useEffect, useState } from "react";
-
-// Create the initial schema with a default roles
+// Create initial schema
 const schema = createSchema({
   user: new Role({
-    name: "user",
-    description: "User role",
-    meta: {
-      name: "user",
-    },
+    name: 'user',
+    description: 'Default user role',
     config: {
-      books: {
-        base: "crudl",
-        custom: {
-          upgrade: true,
-          downgrade: false,
-          sort: true,
-        },
-      },
-    },
-  }),
+      books: { base: 'r---' } // Default: can only read books
+    }
+  })
 });
 
-// Custom hook to fetch user permissions and build the role
-const useUser = () => {
+function useUser() {
   const { build } = useAuthorization(schema);
   const [userRole, setUserRole] = useState(null);
 
   useEffect(() => {
-    // Call the API endpoint to fetch user permissions
-    fetch("/permssions")
-      .then((response) => response.json())
-      .then((data) => {
-        // Build the role based on the received permissions
+    fetch('/api/user-permissions')
+      .then(response => response.json())
+      .then(data => {
         const builtRole = build(data);
         setUserRole(builtRole);
       })
-      .catch((error) => {
-        console.error("Error fetching user permissions:", error);
-      });
+      .catch(error => console.error('Error fetching permissions:', error));
   }, []);
 
   return userRole;
-};
+}
 
-const Component = () => {
+function DynamicBookManager() {
   const userRole = useUser();
 
   if (!userRole) {
     return <div>Loading...</div>;
   }
 
-  const { can, Show } = userRole;
+  const { can } = userRole;
 
   return (
     <div>
-      <div>{can("books", "create").toString()}</div>
-      <Show resources="books" actions="create">
-        <div>Rendered if user has 'create' permission for 'books'</div>
-      </Show>
+      <h1>Dynamic Book Manager</h1>
+      {can('books', 'create') && <button>Create New Book</button>}
+      {can('books', 'publish') && <button>Publish Book</button>}
     </div>
   );
-};
+}
+
+export default DynamicBookManager;
 ```
-### Show component based on permission
 
-This example also demonstrates the usage of the Show component for conditional rendering based on the user's permssions.
+This approach allows you to fetch user-specific permissions from your backend and dynamically construct the role, providing more flexible and granular access control.
 
-1. Import the necessary components and functions from the packages:
+### Conditional Rendering with Show Component
 
-```javascript
+The `Show` component provides a declarative way to conditionally render content based on user permissions:
+
+```jsx
+import React from 'react';
 import { Role } from '@iamjs/core';
 import { createSchema, useAuthorization } from '@iamjs/react';
-```
 
-2. Create a schema using the `createSchema` function:
-
-```javascript
 const schema = createSchema({
-  user: new Role({
-    name: 'user',
-    description: 'User role',
-    meta: {
-      name: 'user'
-    },
+  editor: new Role({
+    name: 'editor',
+    description: 'Editor role',
     config: {
-      books: {
+      articles: {
         base: 'crudl',
         custom: {
-          upgrade: true,
-          downgrade: false,
-          sort: true
+          publish: true,
+          feature: true
         }
       }
     }
   })
 });
+
+function ArticleManager() {
+  const { Show } = useAuthorization(schema);
+
+  return (
+    <div>
+      <h1>Article Manager</h1>
+      <Show role="editor" resources="articles" actions="create">
+        <button>Create New Article</button>
+      </Show>
+      <Show role="editor" resources="articles" actions={['publish', 'feature']}>
+        <div>
+          <button>Publish Article</button>
+          <button>Feature Article</button>
+        </div>
+      </Show>
+    </div>
+  );
+}
+
+export default ArticleManager;
 ```
 
-The schema is created in the same way as in the previous example, with a role named 'user' and its permissions for the 'books' resource.
+The `Show` component simplifies conditional rendering based on roles and permissions, making your JSX cleaner and more declarative.
 
-3. Use the `useAuthorization` hook to access the authorization components:
+## API Reference
 
-```javascript
-const { Show } = useAuthorization(schema);
-```
+### createSchema
 
-The `useAuthorization` hook is used to access the authorization components. In this example, only the `Show` component is extracted from the returned object.
+`createSchema(roles: Record<string, Role>): Schema`
 
-4. Render the `Show` component with the appropriate props:
+Creates a schema object from a record of roles.
 
-```javascript
-<Show role="user" resources="books" actions="create">
-  <div>can show</div>
-</Show>
-```
+### useAuthorization
 
-The `Show` component is used to conditionally render the child components based on the user's role and permissions. It takes props specifying the role, resources, and actions, and renders the child components if the user has permission.&#x20;
+`useAuthorization(schema: Schema): AuthorizationHook`
 
-In summary, this example demonstrates how to use the `Show` component from the `@iamjs/react` package to conditionally render components based on the user's role and permissions. The component is rendered within the `Show` component's block if the user has the specified role, resources, and actions.
+A React hook that provides authorization utilities based on the given schema.
+
+Returns an object with the following properties:
+
+- `can: (role: string, resource: string, action: string) => boolean`
+- `build: (data: object) => BuiltRole`
+- `Show: React.ComponentType<ShowProps>`
+
+### Show Component
+
+`<Show role?: string, resources: string | string[], actions: string | string[]>`
+
+A component for conditional rendering based on permissions.
+
+## Best Practices
+
+1. **Centralize Schema Definition**: Define your schema in a central location and import it where needed to maintain consistency across your application.
+
+2. **Use Environmental Variables**: Store role configurations in environment variables to easily switch between different permission sets for development, staging, and production.
+
+3. **Implement Role Hierarchies**: Utilize role inheritance to create a hierarchy, reducing duplication and simplifying management.
+
+4. **Granular Permissions**: Define permissions at a granular level for fine-tuned access control.
+
+5. **Memoize Authorization Checks**: If performing frequent authorization checks, consider memoizing the results to improve performance.
+
+6. **Keep UI and Authorization in Sync**: Ensure that your UI accurately reflects the user's permissions, hiding or disabling elements they don't have access to.
+
+7. **Regular Audits**: Periodically review and update your role definitions and permissions to ensure they align with your application's evolving security requirements.
+
+## Troubleshooting
+
+- **Permissions Not Updating**: Ensure that you're correctly updating the schema or rebuilding roles when user permissions change.
+- **TypeScript Errors**: Make sure you're using the correct types for roles and permissions. The package exports types to help with this.
+- **Show Component Not Working**: Verify that you're passing the correct role, resources, and actions to the Show component.
+- **Performance Issues**: If you notice performance problems, consider memoizing the results of permission checks or optimizing your schema structure.
+
+## Contributing
+
+We welcome contributions to @iamjs/react! If you'd like to contribute, please:
+
+1. Fork the repository
+2. Create a new branch for your feature or bug fix
+3. Make your changes and write tests if applicable
+4. Submit a pull request with a clear description of your changes
+
+Please see our [Contributing Guide](CONTRIBUTING.md) for more detailed information.
+
+## License
+
+@iamjs/react is released under the [MIT License](LICENSE). See the LICENSE file for more details.

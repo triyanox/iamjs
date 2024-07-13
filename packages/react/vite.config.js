@@ -20,7 +20,7 @@ export default defineConfig({
           return 'index.umd.js';
         }
         return 'index.js';
-      },
+      }
     },
     rollupOptions: {
       external: ['react', 'react-dom'],
@@ -29,7 +29,7 @@ export default defineConfig({
           react: 'React',
           'react-dom': 'ReactDOM'
         }
-      },
+      }
     }
   }
 });
