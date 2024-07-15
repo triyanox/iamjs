@@ -16,7 +16,7 @@
     "@typescript-eslint/parser": "^7.16.0",
     "eslint": "^8.56.0",
     "lerna": "^6.6.1",
-    "prettier": "^2.8.7",
+    "prettier": "^3.3.3",
     "typescript": "^5.0.4"
   },
   "scripts": {
