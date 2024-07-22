@@ -15,7 +15,7 @@
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.16.0",
     "eslint": "^8.56.0",
-    "lerna": "^6.6.1",
+    "lerna": "^8.1.7",
     "prettier": "^2.8.7",
     "typescript": "^5.0.4"
   },
